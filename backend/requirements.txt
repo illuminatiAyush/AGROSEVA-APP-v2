@@ -1,0 +1,24 @@
+# AgroSeva Irrigation Brain Dependencies
+# Python 3.8+ (tested with Python 3.11)
+# Compatible with Windows, Mac, and Linux
+
+# Web Framework
+fastapi==0.104.0
+uvicorn[standard]==0.24.0
+
+# Serial Communication (Arduino)
+pyserial==3.5
+
+# Data Validation
+# Using pydantic 2.5.0 - if build fails, try: pip install pydantic --only-binary :all:
+pydantic==2.5.0
+
+# Deep Reinforcement Learning
+torch>=2.0.0
+gymnasium>=0.29.0
+numpy>=1.24.0
+
+# Image Processing (Leaf Analysis)
+opencv-python>=4.8.0
+Pillow>=10.0.0
+
