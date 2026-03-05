@@ -1,7 +1,6 @@
 export interface SensorData {
-    pH: number;
-    temperature: number;
-    humidity: number;
-    timestamp: number;
-  }
-  
+  pH: number | null;
+  temperature: number;
+  humidity: number;
+  timestamp: number;
+}

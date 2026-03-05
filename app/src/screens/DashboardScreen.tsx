@@ -40,7 +40,7 @@ export default function DashboardScreen({ navigation }: any) {
   // --- STATE ---
   const [refreshing, setRefreshing] = useState(false);
   const [recommendation, setRecommendation] = useState(AIDecisionEngine.analyze()); // Generic Fallback
-  
+
   // REAL WEATHER STATE (From File 1)
   const [weather, setWeather] = useState<{
     temp: number | string;
@@ -82,7 +82,7 @@ export default function DashboardScreen({ navigation }: any) {
   const currentHumidity = sensorHumidity ?? storeWeather.humidity ?? 60;
   const currentPH = realPH ?? 0; // Use real pH, fallback to 0 if not available
   const currentMoisture = realMoisture ?? 0; // Use real moisture, fallback to 0 if not available
-  
+
   const soilRiskResult = calculateAdvancedSoilRisk({
     soilMoisture: currentMoisture,
     temperature: currentTemperature,
@@ -94,7 +94,7 @@ export default function DashboardScreen({ navigation }: any) {
   const loadData = async () => {
     // 1. Fetch Real pH
     fetchPH();
-    
+
     // 2. Fetch Real Weather API
     const forecast = WeatherService.getForecast();
     if (forecast && forecast.length > 0) {
@@ -112,16 +112,16 @@ export default function DashboardScreen({ navigation }: any) {
   useEffect(() => {
     // Start polling moisture every 2 seconds
     const cleanupMoisture = startMoisturePolling();
-    
+
     // Start polling pH every 2 seconds
     const cleanupPH = startPHPolling();
-    
+
     // Start polling status (includes yield data) every 2 seconds
     const cleanupStatus = startStatusPolling();
-    
+
     // Load initial data
     loadData();
-    
+
     // Cleanup: stop polling when component unmounts
     return () => {
       cleanupMoisture();
@@ -146,7 +146,7 @@ export default function DashboardScreen({ navigation }: any) {
 
   return (
     <View style={styles.container}>
-      <ScrollView 
+      <ScrollView
         contentContainerStyle={{ paddingBottom: 100 }}
         refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}
       >
@@ -174,20 +174,20 @@ export default function DashboardScreen({ navigation }: any) {
               <Text style={styles.temp}>{weather.temp}°C</Text>
               <Text style={styles.weatherDesc}>{weather.condition}</Text>
             </View>
-            <Ionicons 
-              name={getWeatherIcon(weather.code || 0)} 
-              size={56} 
-              color="#FFD700" 
+            <Ionicons
+              name={getWeatherIcon(weather.code || 0)}
+              size={56}
+              color="#FFD700"
               style={{ textShadowColor: 'rgba(0,0,0,0.2)', textShadowRadius: 10 }}
             />
           </View>
         </LinearGradient>
 
         <View style={styles.bodyContainer}>
-          
+
           {/* === SECTION 1: FARM RECOMMENDATIONS (From File 2 Logic) === */}
           {configuredZones.length === 0 ? (
-             // SHOW SETUP CARD IF NO ZONES
+            // SHOW SETUP CARD IF NO ZONES
             <View style={[styles.card, styles.setupCard]}>
               <Ionicons name="information-circle" size={32} color={colors.primary} />
               <Text style={styles.setupTitle}>{t('farmSetupRequired')}</Text>
@@ -203,13 +203,13 @@ export default function DashboardScreen({ navigation }: any) {
               </TouchableOpacity>
             </View>
           ) : (
-             // SHOW ZONE CARDS IF CONFIGURED
+            // SHOW ZONE CARDS IF CONFIGURED
             <View>
               <Text style={styles.sectionTitle}>{t('aiRecommendation')}</Text>
               {configuredZones.map(zone => {
                 const decision = getLatestDecision(zone.zoneId);
                 if (!decision) return null;
-                
+
                 return (
                   <ZoneRecommendationCard
                     key={zone.zoneId}
@@ -220,7 +220,7 @@ export default function DashboardScreen({ navigation }: any) {
                   />
                 );
               })}
-              
+
               {/* Add Zone Button */}
               <TouchableOpacity
                 style={styles.addZoneButton}
@@ -290,7 +290,7 @@ export default function DashboardScreen({ navigation }: any) {
           {/* === SECTION 3: LIVE SENSORS (From File 1 - Real pH) === */}
           <Text style={[styles.sectionTitle, { marginTop: 25 }]}>{t('soilStatus')}</Text>
           <View style={styles.gridContainer}>
-            
+
             {/* Moisture (Live) */}
             <View style={styles.sensorCard}>
               <View style={[styles.iconBg, { backgroundColor: '#E3F2FD' }]}>
@@ -301,8 +301,8 @@ export default function DashboardScreen({ navigation }: any) {
             </View>
 
             {/* pH Level (REAL SENSOR DATA) */}
-            <TouchableOpacity 
-              style={styles.sensorCard} 
+            <TouchableOpacity
+              style={styles.sensorCard}
               onPress={() => navigation.navigate('pH Monitor')}
             >
               <View style={[styles.iconBg, { backgroundColor: '#F3E5F5' }]}>
@@ -337,33 +337,33 @@ export default function DashboardScreen({ navigation }: any) {
           {/* === SECTION 4: QUICK ACCESS (From File 1) === */}
           <Text style={styles.sectionTitle}>{t('quickAccess')}</Text>
           <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.quickScroll}>
-              <TouchableOpacity style={styles.quickBtn} onPress={() => navigation.navigate('Scan')}>
-                <LinearGradient colors={['#29B6F6', '#0288D1']} style={styles.quickIcon}>
-                  <Ionicons name="camera" size={22} color="#FFF" />
-                </LinearGradient>
-                <Text style={styles.quickText}>{t('scanCrop')}</Text>
-              </TouchableOpacity>
+            <TouchableOpacity style={styles.quickBtn} onPress={() => navigation.navigate('Scan')}>
+              <LinearGradient colors={['#29B6F6', '#0288D1']} style={styles.quickIcon}>
+                <Ionicons name="camera" size={22} color="#FFF" />
+              </LinearGradient>
+              <Text style={styles.quickText}>{t('scanCrop')}</Text>
+            </TouchableOpacity>
 
-              <TouchableOpacity style={styles.quickBtn} onPress={() => navigation.navigate('Monitor')}>
-                <LinearGradient colors={['#FFA726', '#F57C00']} style={styles.quickIcon}>
-                  <Ionicons name="analytics" size={22} color="#FFF" />
-                </LinearGradient>
-                <Text style={styles.quickText}>{t('analytics')}</Text>
-              </TouchableOpacity>
+            <TouchableOpacity style={styles.quickBtn} onPress={() => navigation.navigate('Monitor')}>
+              <LinearGradient colors={['#FFA726', '#F57C00']} style={styles.quickIcon}>
+                <Ionicons name="analytics" size={22} color="#FFF" />
+              </LinearGradient>
+              <Text style={styles.quickText}>{t('analytics')}</Text>
+            </TouchableOpacity>
 
-              <TouchableOpacity style={styles.quickBtn} onPress={() => navigation.navigate('Settings')}>
-                <LinearGradient colors={['#78909C', '#455A64']} style={styles.quickIcon}>
-                  <Ionicons name="settings" size={22} color="#FFF" />
-                </LinearGradient>
-                <Text style={styles.quickText}>{t('settings')}</Text>
-              </TouchableOpacity>
+            <TouchableOpacity style={styles.quickBtn} onPress={() => navigation.navigate('Settings')}>
+              <LinearGradient colors={['#78909C', '#455A64']} style={styles.quickIcon}>
+                <Ionicons name="settings" size={22} color="#FFF" />
+              </LinearGradient>
+              <Text style={styles.quickText}>{t('settings')}</Text>
+            </TouchableOpacity>
 
-              <TouchableOpacity style={styles.quickBtn} onPress={() => navigation.navigate('SensorPlanner')}>
-                <LinearGradient colors={['#2E7D32', '#1B5E20']} style={styles.quickIcon}>
-                  <Ionicons name="grid-outline" size={22} color="#FFF" />
-                </LinearGradient>
-                <Text style={styles.quickText}>{t('planSensors')}</Text>
-              </TouchableOpacity>
+            <TouchableOpacity style={styles.quickBtn} onPress={() => navigation.navigate('SensorPlanner')}>
+              <LinearGradient colors={['#2E7D32', '#1B5E20']} style={styles.quickIcon}>
+                <Ionicons name="grid-outline" size={22} color="#FFF" />
+              </LinearGradient>
+              <Text style={styles.quickText}>{t('planSensors')}</Text>
+            </TouchableOpacity>
           </ScrollView>
 
         </View>
@@ -374,7 +374,7 @@ export default function DashboardScreen({ navigation }: any) {
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#F4F6F8' },
-  
+
   // Header
   header: { paddingTop: 60, paddingBottom: 30, paddingHorizontal: 20, borderBottomLeftRadius: 30, borderBottomRightRadius: 30 },
   headerTop: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 25 },
@@ -420,15 +420,15 @@ const styles = StyleSheet.create({
   quickText: { color: '#546E7A', fontSize: 12, fontWeight: '600' },
 
   // Yield Impact Card
-  yieldCard: { 
-    backgroundColor: '#FFF', 
-    padding: 20, 
-    borderRadius: 16, 
-    elevation: 4, 
-    shadowColor: '#000', 
-    shadowOpacity: 0.1, 
-    shadowRadius: 10, 
-    marginBottom: 20 
+  yieldCard: {
+    backgroundColor: '#FFF',
+    padding: 20,
+    borderRadius: 16,
+    elevation: 4,
+    shadowColor: '#000',
+    shadowOpacity: 0.1,
+    shadowRadius: 10,
+    marginBottom: 20
   },
   yieldMetricsContainer: {
     marginBottom: 16,

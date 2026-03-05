@@ -11,10 +11,8 @@ export const translations = {
     recommendedCrop: "Recommended Crop for This Season",
     season: "Season",
     whyThisCrop: "Why this crop?",
-    hideDetails: "Hide Details",
     parameterComparison: "Parameter Comparison",
     current: "Current",
-    ideal: "Ideal",
     confidence: "Confidence",
     cropSelection: "Crop Selection & Suitability",
     selectSeasonForRecommendations: "Select season to get weather-based crop recommendations",
@@ -74,7 +72,7 @@ export const translations = {
     wait: "WAIT",
     safe: "SAFE",
     fertilize: "FERTILIZE",
-    
+
     // AI Reasons
     rainSoon: "Rain Forecasted Soon",
     rainSoonDesc: "Soil is dry (40%), but rain is expected in 24h. Skipping irrigation to save water.",
@@ -93,6 +91,10 @@ export const translations = {
 
     // Monitor Screen
     fieldMonitor: "Field Monitor",
+    overview: "Overview",
+    advancedSoil: "Advanced Soil",
+    sensors: "Sensors",
+    risk: "Risk",
     sensorId: "Sensor ID",
     environment: "Environment",
     temperature: "Temperature",
@@ -142,6 +144,8 @@ export const translations = {
     // Settings
     settings: "Settings",
     appPreferences: "App Preferences",
+    premiumAccount: "Premium Account",
+    collegeName: "VPPCOE VA",
     language: "Language",
     irrigationAlerts: "Irrigation Alerts",
     stormWarnings: "Storm Warnings",
@@ -165,22 +169,37 @@ export const translations = {
     esp32Online: "ESP32 Controller is Online.",
     builtBy: "Built by Team Tech Spartans",
     forSIH: "For SIH 2025",
+    appVersion: "v1.0.0",
+    connectedStatus: "Connected",
+    farmCity: "Mumbai, IN",
 
     // Dashboard Quick Access
     scanCrop: "Scan Crop",
     analytics: "Analytics",
+    locationState: "Maharashtra, India",
+    weatherCondition: "Sunny",
+    totalWater: "Total Water",
+    lakhLiters: "lakh liters",
+    mm: "mm",
+    mmUnit: "mm",
+    updatedLabel: "Updated",
+    updatedNever: "Never",
+    confidenceHigh: "High",
+    confidenceMedium: "Medium",
+    confidenceLow: "Low",
     quickAccess: "Quick Access",
     farmSetupRequired: "Farm Setup Required",
     farmSetupText: "Configure your farm zones and crops to get AI-powered recommendations",
     setupFarm: "Setup Farm",
     addAnotherZone: "Add Another Zone",
+    totalWaterLabel: "Total Water",
+    waterNeededLabel: "Water Needed",
 
     // Zone Recommendation Card
     waterNeeded: "Water Needed",
     fertilizerNeeded: "Fertilizer Needed",
     soilTreatmentNeeded: "Soil Treatment Needed",
     noActionNeeded: "No Action Needed",
-    confidence: "Confidence",
     high: "High",
     medium: "Medium",
     low: "Low",
@@ -227,7 +246,6 @@ export const translations = {
     estimatedAccuracy: "Estimated Accuracy",
     totalCost: "Total Cost",
     viewDetails: "View Details",
-    hideDetails: "Hide Details",
     sensorType: "Sensor Type",
     required: "Required",
     installed: "Installed",
@@ -238,10 +256,9 @@ export const translations = {
 
     // Crop Recommendation
     cropRecommendation: "Smart Crop Recommendation",
-    selectSeason: "Select Season",
     currentSensorData: "Current Sensor Data",
     predictedSensorData: "Predicted Sensor Data",
-    weatherSummary: "Weather Summary",
+    weatherSummaryTitle: "Weather Summary",
     rainExpected: "Rain Expected",
     noRainExpected: "No Rain Expected",
     cloudCoverage: "Cloud Coverage",
@@ -266,6 +283,17 @@ export const translations = {
     hideDetails: "विवरण छुपाएं",
     parameterComparison: "पैरामीटर तुलना",
     current: "वर्तमान",
+    locationState: "महाराष्ट्र, भारत",
+    weatherCondition: "धूप",
+    totalWater: "कुल पानी",
+    lakhLiters: "लाख लीटर",
+    mm: "मिमी",
+    mmUnit: "मिमी",
+    updatedLabel: "अपडेट किया गया",
+    updatedNever: "कभी नहीं",
+    confidenceHigh: "उच्च",
+    confidenceMedium: "मध्यम",
+    confidenceLow: "कम",
     ideal: "आदर्श",
     confidence: "विश्वास",
     cropSelection: "फसल चयन और उपयुक्तता",
@@ -288,7 +316,6 @@ export const translations = {
     advancedSoilRisk: "उन्नत मिट्टी जोखिम",
     calculatedFromLiveSensors: "लाइव सेंसर डेटा से गणना की गई",
     whyThisRisk: "यह जोखिम क्यों?",
-    hideDetails: "विवरण छुपाएं",
     stressBreakdown: "तनाव विश्लेषण",
     moistureStress: "नमी तनाव",
     heatStress: "ताप तनाव",
@@ -322,7 +349,7 @@ export const translations = {
     wait: "रुको",
     safe: "सुरक्षित",
     fertilize: "खाद डालें",
-    
+
     // AI Reasons
     rainSoon: "जल्द बारिश की संभावना",
     rainSoonDesc: "मिट्टी सूखी है (40%), लेकिन 24 घंटे में बारिश की उम्मीद है। पानी बचाने के लिए सिंचाई रोकें।",
@@ -341,6 +368,10 @@ export const translations = {
 
     // Monitor Screen
     fieldMonitor: "फील्ड मॉनिटर",
+    overview: "सारांश",
+    advancedSoil: "उन्नत मिट्टी",
+    sensors: "सेंसर",
+    risk: "जोखिम",
     sensorId: "सेंसर ID",
     environment: "वातावरण",
     temperature: "तापमान",
@@ -354,7 +385,6 @@ export const translations = {
     phAnalysis: "pH विश्लेषण",
     phReferenceScale: "pH संदर्भ स्केल",
     acidic: "अम्लीय",
-    ideal: "आदर्श",
     alkaline: "क्षारीय",
     sensorDiagnostics: "सेंसर निदान",
     dataSource: "डेटा स्रोत",
@@ -391,6 +421,8 @@ export const translations = {
     settings: "सेटिंग्स",
     appPreferences: "ऐप प्राथमिकताएं",
     language: "भाषा",
+    premiumAccount: "प्रीमियम खाता",
+    collegeName: "VPPCOE VA",
     irrigationAlerts: "सिंचाई अलर्ट",
     stormWarnings: "तूफान चेतावनी",
     biometricLogin: "बायोमेट्रिक लॉगिन",
@@ -413,6 +445,9 @@ export const translations = {
     esp32Online: "ESP32 कंट्रोलर ऑनलाइन है।",
     builtBy: "टीम टेक स्पार्टन्स द्वारा निर्मित",
     forSIH: "SIH 2025 के लिए",
+    appVersion: "v1.0.0",
+    connectedStatus: "कनेक्टेड",
+    farmCity: "मुंबई, भारत",
 
     // Dashboard Quick Access
     scanCrop: "फसल स्कैन करें",
@@ -422,13 +457,15 @@ export const translations = {
     farmSetupText: "AI-संचालित सिफारिशें प्राप्त करने के लिए अपने फार्म जोन और फसलें कॉन्फ़िगर करें",
     setupFarm: "फार्म सेटअप करें",
     addAnotherZone: "एक और जोन जोड़ें",
+    totalWaterLabel: "कुल पानी",
+    waterNeededLabel: "पानी की आवश्यकता",
 
     // Zone Recommendation Card
     waterNeeded: "पानी की आवश्यकता",
     fertilizerNeeded: "उर्वरक की आवश्यकता",
     soilTreatmentNeeded: "मिट्टी उपचार आवश्यक",
     noActionNeeded: "कोई कार्रवाई आवश्यक नहीं",
-    confidence: "विश्वास",
+
     high: "उच्च",
     medium: "मध्यम",
     low: "कम",
@@ -475,7 +512,7 @@ export const translations = {
     estimatedAccuracy: "अनुमानित सटीकता",
     totalCost: "कुल लागत",
     viewDetails: "विवरण देखें",
-    hideDetails: "विवरण छुपाएं",
+
     sensorType: "सेंसर प्रकार",
     required: "आवश्यक",
     installed: "स्थापित",
@@ -486,10 +523,9 @@ export const translations = {
 
     // Crop Recommendation
     cropRecommendation: "स्मार्ट फसल सिफारिश",
-    selectSeason: "मौसम चुनें",
     currentSensorData: "वर्तमान सेंसर डेटा",
     predictedSensorData: "अनुमानित सेंसर डेटा",
-    weatherSummary: "मौसम सारांश",
+    weatherSummaryTitle: "मौसम सारांश",
     rainExpected: "बारिश की उम्मीद",
     noRainExpected: "बारिश की उम्मीद नहीं",
     cloudCoverage: "बादल आच्छादन",
@@ -511,10 +547,20 @@ export const translations = {
     recommendedCrop: "या हंगामासाठी शिफारस केलेली पिके",
     season: "हंगाम",
     whyThisCrop: "हे पीक का?",
+    locationState: "महाराष्ट्र, भारत",
+    weatherCondition: "सूर्यप्रकाश",
+    totalWater: "एकूण पाणी",
+    lakhLiters: "लाख लिटर",
+    mm: "मिमी",
+    mmUnit: "मिमी",
+    updatedLabel: "अपडेट केले",
+    updatedNever: "कधीही नाही",
+    confidenceHigh: "उच्च",
+    confidenceMedium: "मध्यम",
+    confidenceLow: "कमी",
     hideDetails: "तपशील लपवा",
     parameterComparison: "पॅरामीटर तुलना",
     current: "सध्याचे",
-    ideal: "आदर्श",
     confidence: "आत्मविश्वास",
     cropSelection: "पीक निवड आणि योग्यता",
     selectSeasonForRecommendations: "हंगाम निवडून हवामान-आधारित पीक शिफारसी मिळवा",
@@ -540,7 +586,7 @@ export const translations = {
     advancedSoilRisk: "प्रगत माती जोखीम",
     calculatedFromLiveSensors: "लाइव्ह सेंसर डेटावरून गणना केली",
     whyThisRisk: "हे जोखीम का?",
-    hideDetails: "तपशील लपवा",
+
     stressBreakdown: "तणाव विश्लेषण",
     moistureStress: "ओलावा तणाव",
     heatStress: "उष्णता तणाव",
@@ -574,7 +620,7 @@ export const translations = {
     wait: "थांबा",
     safe: "सुरक्षित",
     fertilize: "खत टाका",
-    
+
     // AI Reasons
     rainSoon: "लवकरच पावसाची शक्यता",
     rainSoonDesc: "जमीन कोरडी आहे (40%), पण 24 तासांत पावसाची अपेक्षा आहे. पाणी वाचवण्यासाठी सिंचन थांबवा.",
@@ -593,6 +639,10 @@ export const translations = {
 
     // Monitor Screen
     fieldMonitor: "फील्ड मॉनिटर",
+    overview: "आढावा",
+    advancedSoil: "प्रगत माती",
+    sensors: "सेंसर",
+    risk: "जोखीम",
     sensorId: "सेंसर ID",
     environment: "वातावरण",
     temperature: "तापमान",
@@ -640,6 +690,8 @@ export const translations = {
     exportReport: "अहवाल निर्यात करा",
 
     // Settings
+    premiumAccount: "प्रीमियम खाते",
+    collegeName: "VPPCOE VA",
     settings: "सेटिंग्ज",
     appPreferences: "अॅप प्राधान्ये",
     language: "भाषा",
@@ -665,6 +717,9 @@ export const translations = {
     esp32Online: "ESP32 कंट्रोलर ऑनलाइन आहे.",
     builtBy: "टीम टेक स्पार्टन्स द्वारे बनवले",
     forSIH: "SIH 2025 साठी",
+    appVersion: "v1.0.0",
+    connectedStatus: "कनेक्टेड",
+    farmCity: "मुंबई, भारत",
 
     // Dashboard Quick Access
     scanCrop: "पीक स्कॅन करा",
@@ -674,13 +729,15 @@ export const translations = {
     farmSetupText: "AI-चालित शिफारसी मिळवण्यासाठी आपले शेत जोन आणि पिके कॉन्फिगर करा",
     setupFarm: "शेत सेटअप करा",
     addAnotherZone: "आणखी एक जोन जोडा",
+    totalWaterLabel: "एकूण पाणी",
+    waterNeededLabel: "पाण्याची गरज",
 
     // Zone Recommendation Card
-    waterNeeded: "पाणी आवश्यक",
+    waterNeeded: "पाण्याची गरज",
     fertilizerNeeded: "खत आवश्यक",
     soilTreatmentNeeded: "माती उपचार आवश्यक",
     noActionNeeded: "कोणतीही कृती आवश्यक नाही",
-    confidence: "आत्मविश्वास",
+
     high: "उच्च",
     medium: "मध्यम",
     low: "कमी",
@@ -727,7 +784,7 @@ export const translations = {
     estimatedAccuracy: "अंदाजित अचूकता",
     totalCost: "एकूण खर्च",
     viewDetails: "तपशील पहा",
-    hideDetails: "तपशील लपवा",
+
     sensorType: "सेंसर प्रकार",
     required: "आवश्यक",
     installed: "स्थापित",
@@ -738,10 +795,9 @@ export const translations = {
 
     // Crop Recommendation
     cropRecommendation: "स्मार्ट पीक शिफारस",
-    selectSeason: "हंगाम निवडा",
     currentSensorData: "सध्याचा सेंसर डेटा",
     predictedSensorData: "अंदाजित सेंसर डेटा",
-    weatherSummary: "हवामान सारांश",
+    weatherSummaryTitle: "हवामान सारांश",
     rainExpected: "पाऊस अपेक्षित",
     noRainExpected: "पाऊस अपेक्षित नाही",
     cloudCoverage: "ढगाचे आच्छादन",

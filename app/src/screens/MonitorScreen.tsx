@@ -43,7 +43,7 @@ const SensorRow = ({ label, value, unit, max, icon, color, isReal = false }: any
         <View style={{ flexDirection: 'row', alignItems: 'center' }}>
           {isReal && <View style={styles.liveDot} />}
           <Text style={[styles.value, { color: color }]}>
-            {typeof value === 'number' ? value.toFixed(1) : '--'} 
+            {typeof value === 'number' ? value.toFixed(1) : '--'}
             <Text style={styles.unit}> {unit}</Text>
           </Text>
         </View>
@@ -59,32 +59,41 @@ export default function MonitorScreen() {
   const navigation = useNavigation();
   const t = useTranslation();
   const [activeTab, setActiveTab] = useState<TabType>('Overview');
-  
+
   // 1. Get Mock Data
   const { soilData, weather: storeWeather } = useStore();
-  
+
   // 2. Get Real pH Data
   const { pH: realPH, fetchPH, startPolling: startPHPolling, stopPolling: stopPHPolling } = usePHStore();
-  
+
   // 3. Get Real Moisture Data (live from Arduino)
   const { moisture: liveMoisture, isLoading: moistureLoading, error: moistureError, startPolling, stopPolling } = useMoistureStore();
 
   // 4. Get Sensor Data
-  const { temperature: sensorTemp, humidity: sensorHumidity } = useSensorStore();
+  const { 
+    temperature: sensorTemp, 
+    humidity: sensorHumidity,
+    startPolling: startSensorPolling
+  } = useSensorStore();
 
   useEffect(() => {
-    // Start polling moisture every 2 seconds
+
+    // Moisture polling
     const cleanupMoisture = startPolling();
     
-    // Start polling pH every 2 seconds
+    // pH polling
     const cleanupPH = startPHPolling();
     
-    // Cleanup: stop polling when component unmounts
+    // 🌡️ Temperature + Humidity polling
+    const cleanupSensor = startSensorPolling();
+    
     return () => {
       cleanupMoisture();
       cleanupPH();
+      cleanupSensor();
     };
-  }, [startPolling, startPHPolling]);
+  
+  }, [startPolling, startPHPolling, startSensorPolling]);
 
   // Calculate Advanced Soil Risk
   // Weather is optional in MonitorScreen, fallback applied to avoid crash
@@ -134,17 +143,21 @@ export default function MonitorScreen() {
             <Ionicons name="thermometer" size={24} color={colors.error} />
           </View>
           <View>
-            <Text style={styles.envValue}>{storeWeather?.temp ?? '--'}°C</Text>
+            <Text style={styles.envValue}>
+              {sensorTemp !== null ? sensorTemp.toFixed(1) : '--'}°C
+            </Text>
             <Text style={styles.envLabel}>{t('temperature')}</Text>
           </View>
         </View>
-        
+
         <View style={styles.envCard}>
           <View style={[styles.envIcon, { backgroundColor: '#E3F2FD' }]}>
             <Ionicons name="water" size={24} color={colors.water} />
           </View>
           <View>
-            <Text style={styles.envValue}>{storeWeather?.humidity ?? '--'}%</Text>
+            <Text style={styles.envValue}>
+              {sensorHumidity !== null ? sensorHumidity.toFixed(1) : '--'}%
+            </Text>
             <Text style={styles.envLabel}>{t('humidity')}</Text>
           </View>
         </View>
@@ -152,57 +165,57 @@ export default function MonitorScreen() {
 
       {/* === SOIL HEALTH === */}
       <Text style={styles.sectionTitle}>{t('soilHealth')}</Text>
-      
+
       {/* Real pH Data */}
-      <SensorRow 
-        label={`${t('phLevel')} (${t('live')})`} 
-        value={realPH} 
-        unit="pH" 
-        max={14} 
-        icon="flask" 
-        color={colors.secondary} 
+      <SensorRow
+        label={`${t('phLevel')} (${t('live')})`}
+        value={realPH}
+        unit="pH"
+        max={14}
+        icon="flask"
+        color={colors.secondary}
         isReal={true}
       />
 
       {/* Live Moisture from Arduino */}
-      <SensorRow 
-        label={`${t('moisture')} (${t('live')})`} 
-        value={liveMoisture} 
-        unit="%" 
-        max={100} 
-        icon="water" 
-        color={colors.water} 
+      <SensorRow
+        label={`${t('moisture')} (${t('live')})`}
+        value={liveMoisture}
+        unit="%"
+        max={100}
+        icon="water"
+        color={colors.water}
         isReal={true}
       />
 
       {/* === NUTRIENTS (NPK) === */}
       <Text style={styles.sectionTitle}>{t('nutrients')}</Text>
 
-      <SensorRow 
-        label={`${t('nitrogen')} (N)`} 
-        value={soilData.nitrogen} 
-        unit="mg/kg" 
-        max={200} 
-        icon="leaf" 
-        color="#43A047" 
+      <SensorRow
+        label={`${t('nitrogen')} (N)`}
+        value={soilData.nitrogen}
+        unit="mg/kg"
+        max={200}
+        icon="leaf"
+        color="#43A047"
       />
-      
-      <SensorRow 
-        label={`${t('phosphorus')} (P)`} 
-        value={soilData.phosphorus} 
-        unit="mg/kg" 
-        max={100} 
-        icon="flower" 
-        color="#FBC02D" 
+
+      <SensorRow
+        label={`${t('phosphorus')} (P)`}
+        value={soilData.phosphorus}
+        unit="mg/kg"
+        max={100}
+        icon="flower"
+        color="#FBC02D"
       />
-      
-      <SensorRow 
-        label={`${t('potassium')} (K)`} 
-        value={soilData.potassium} 
-        unit="mg/kg" 
-        max={300} 
-        icon="shaker" 
-        color="#8D6E63" 
+
+      <SensorRow
+        label={`${t('potassium')} (K)`}
+        value={soilData.potassium}
+        unit="mg/kg"
+        max={300}
+        icon="shaker"
+        color="#8D6E63"
       />
     </>
   );
@@ -218,7 +231,7 @@ export default function MonitorScreen() {
           pH: currentPH,
         }}
       />
-      
+
       {/* EC Risk Assessment - SEPARATE feature */}
       <ECRiskCard
         ecRiskResult={ecRiskResult}
@@ -240,7 +253,7 @@ export default function MonitorScreen() {
   const renderSensorsTab = () => (
     <>
       <Text style={styles.sectionTitle}>{t('liveSensorData')}</Text>
-      
+
       <View style={styles.sensorGrid}>
         <View style={styles.sensorTile}>
           <View style={[styles.sensorTileIcon, { backgroundColor: '#F3E5F5' }]}>
@@ -249,7 +262,7 @@ export default function MonitorScreen() {
           <Text style={styles.sensorTileValue}>
             {currentPH.toFixed(1)}
           </Text>
-          <Text style={styles.sensorTileLabel}>pH Level</Text>
+          <Text style={styles.sensorTileLabel}>{t('phLevel')}</Text>
           <View style={styles.liveBadge}>
             <View style={styles.liveDot} />
             <Text style={styles.liveText}>{t('live')}</Text>
@@ -304,7 +317,7 @@ export default function MonitorScreen() {
   const renderRiskTab = () => {
     const riskLevel = soilRiskResult.level;
     const riskScore = soilRiskResult.score;
-    
+
     const getRiskColor = () => {
       switch (riskLevel) {
         case 'Healthy': return '#4CAF50';
@@ -345,7 +358,7 @@ export default function MonitorScreen() {
               <Text style={styles.riskScoreText}>{riskScore}</Text>
             </View>
           </View>
-          
+
           <Text style={styles.riskMessage}>{getRiskMessage()}</Text>
 
           <View style={styles.riskFactors}>
@@ -361,28 +374,28 @@ export default function MonitorScreen() {
 
         <View style={styles.riskBreakdownCard}>
           <Text style={styles.sectionTitle}>{t('riskBreakdown') || 'Risk Breakdown'}</Text>
-          
+
           <View style={styles.breakdownRow}>
             <Text style={styles.breakdownLabel}>{t('moistureStress')}</Text>
             <Text style={[styles.breakdownValue, { color: getRiskColor() }]}>
               {soilRiskResult.breakdown.moistureScore}/30
             </Text>
           </View>
-          
+
           <View style={styles.breakdownRow}>
             <Text style={styles.breakdownLabel}>{t('heatStress')}</Text>
             <Text style={[styles.breakdownValue, { color: getRiskColor() }]}>
               {soilRiskResult.breakdown.heatScore}/25
             </Text>
           </View>
-          
+
           <View style={styles.breakdownRow}>
             <Text style={styles.breakdownLabel}>{t('humidityStress')}</Text>
             <Text style={[styles.breakdownValue, { color: getRiskColor() }]}>
               {soilRiskResult.breakdown.humidityScore}/20
             </Text>
           </View>
-          
+
           <View style={styles.breakdownRow}>
             <Text style={styles.breakdownLabel}>{t('phRisk')}</Text>
             <Text style={[styles.breakdownValue, { color: getRiskColor() }]}>
@@ -396,7 +409,7 @@ export default function MonitorScreen() {
 
   return (
     <View style={styles.container}>
-      
+
       {/* === HEADER === */}
       <LinearGradient colors={[colors.primary, '#004D40']} style={styles.header}>
         <View style={styles.headerContent}>
@@ -413,15 +426,22 @@ export default function MonitorScreen() {
 
       {/* === TAB SWITCHER === */}
       <View style={styles.tabContainer}>
-        {(['Overview', 'Advanced Soil', 'Sensors', 'Risk'] as TabType[]).map((tab) => (
+        {(
+          [
+            { key: 'Overview', label: t('overview') },
+            { key: 'Advanced Soil', label: t('advancedSoil') },
+            { key: 'Sensors', label: t('sensors') },
+            { key: 'Risk', label: t('risk') },
+          ] as { key: TabType; label: string }[]
+        ).map((tab) => (
           <TouchableOpacity
-            key={tab}
-            style={[styles.tab, activeTab === tab && styles.tabActive]}
-            onPress={() => setActiveTab(tab)}
+            key={tab.key}
+            style={[styles.tab, activeTab === tab.key && styles.tabActive]}
+            onPress={() => setActiveTab(tab.key)}
             activeOpacity={0.7}
           >
-            <Text style={[styles.tabText, activeTab === tab && styles.tabTextActive]}>
-              {tab}
+            <Text style={[styles.tabText, activeTab === tab.key && styles.tabTextActive]}>
+              {tab.label}
             </Text>
           </TouchableOpacity>
         ))}
@@ -436,7 +456,7 @@ export default function MonitorScreen() {
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#F4F6F8' },
-  
+
   // Header
   header: { paddingTop: 50, paddingBottom: 25, paddingHorizontal: 20, borderBottomLeftRadius: 30, borderBottomRightRadius: 30 },
   headerContent: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 10 },
@@ -475,19 +495,19 @@ const styles = StyleSheet.create({
   },
 
   scrollContent: { padding: 20, paddingBottom: 50 },
-  
+
   sectionTitle: { fontSize: 18, fontWeight: 'bold', marginTop: 15, marginBottom: 12, color: '#37474F' },
-  
+
   // Sensor Card
   card: { flexDirection: 'row', backgroundColor: '#FFF', padding: 16, borderRadius: 16, marginBottom: 12, alignItems: 'center', elevation: 2, shadowColor: '#000', shadowOpacity: 0.05, shadowRadius: 5 },
   iconBox: { width: 48, height: 48, borderRadius: 14, justifyContent: 'center', alignItems: 'center' },
   label: { fontSize: 15, fontWeight: '600', color: '#455A64' },
   value: { fontSize: 16, fontWeight: 'bold' },
   unit: { fontSize: 12, color: '#90A4AE', fontWeight: 'normal' },
-  
+
   progressBg: { height: 8, backgroundColor: '#F5F5F5', borderRadius: 4, width: '100%' },
   progressFill: { height: '100%', borderRadius: 4 },
-  
+
   liveDot: { width: 8, height: 8, borderRadius: 4, backgroundColor: '#4CAF50', marginRight: 6 },
   liveBadge: {
     flexDirection: 'row',

@@ -4,19 +4,20 @@ import { View, Text, StyleSheet, TouchableOpacity, Switch, ScrollView, Alert, Di
 import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 import { CommonActions } from '@react-navigation/native';
+import { Linking } from 'react-native';
 import { useLanguageStore } from '@/store/useLanguageStore';
+import { useUserStore } from '@/store/useUserStore';
 import { useTranslation } from '@/utils/i18n';
 import { colors } from '@/theme/colors';
 
 const { width } = Dimensions.get('window');
-
 const GRADIENT_COLORS = [colors.primary, '#004D40'] as const;
 
 // Reusable Setting Row Component
 const SettingItem = ({ icon, title, value, type, onPress, color = colors.primary }: any) => (
-  <TouchableOpacity 
-    style={styles.item} 
-    onPress={onPress} 
+  <TouchableOpacity
+    style={styles.item}
+    onPress={onPress}
     disabled={type === 'switch'}
     activeOpacity={0.7}
   >
@@ -26,10 +27,11 @@ const SettingItem = ({ icon, title, value, type, onPress, color = colors.primary
       </View>
       <Text style={styles.itemText}>{title}</Text>
     </View>
-    
+
     {type === 'switch' ? (
-      <Switch 
-        value={value} 
+      <Switch
+        value={value}
+        onValueChange={onPress} // Updated to handle switch toggle via onPress prop
         trackColor={{ false: '#E0E0E0', true: color + '50' }}
         thumbColor={value ? color : '#f4f3f4'}
         style={{ transform: [{ scaleX: 0.9 }, { scaleY: 0.9 }] }}
@@ -46,8 +48,17 @@ const SettingItem = ({ icon, title, value, type, onPress, color = colors.primary
 export default function SettingsScreen({ navigation }: any) {
   const t = useTranslation();
   const { language, setLanguage } = useLanguageStore();
-  
-  // Local State for Toggles
+  const { name: userName } = useUserStore();
+
+  const getInitials = (name: string) => {
+    return name
+      .split(' ')
+      .map((n) => n[0])
+      .join('')
+      .substring(0, 2)
+      .toUpperCase();
+  };
+
   const [notifications, setNotifications] = useState(true);
   const [stormAlerts, setStormAlerts] = useState(true);
   const [biometric, setBiometric] = useState(false);
@@ -71,8 +82,8 @@ export default function SettingsScreen({ navigation }: any) {
       t('logoutQuestion'),
       [
         { text: t('cancel'), style: "cancel" },
-        { 
-          text: t('logoutConfirm'), 
+        {
+          text: t('logoutConfirm'),
           style: "destructive",
           onPress: () => {
             navigation.dispatch(
@@ -90,69 +101,67 @@ export default function SettingsScreen({ navigation }: any) {
   return (
     <View style={styles.container}>
       <StatusBar barStyle="light-content" backgroundColor={colors.primary} />
-      
-      {/* === HEADER GRADIENT (FIXED UI) === */}
+
       <LinearGradient colors={GRADIENT_COLORS} style={styles.header}>
         <Text style={styles.headerTitle}>{t('settings')}</Text>
       </LinearGradient>
 
-      <ScrollView 
-        contentContainerStyle={styles.scrollContent} 
+      <ScrollView
+        contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}
         style={styles.scrollView}
       >
-        
-        {/* === PROFILE CARD (Floating) === */}
+
+        {/* === PROFILE CARD (Translated & Dynamic) === */}
         <View style={styles.profileCard}>
           <View style={styles.avatarContainer}>
-             <Text style={styles.avatarText}>SB</Text>
-             <View style={styles.editBadge}>
-               <Ionicons name="pencil" size={12} color="#FFF" />
-             </View>
+            <Text style={styles.avatarText}>{getInitials(userName || 'Farmer')}</Text>
+            <View style={styles.editBadge}>
+              <Ionicons name="pencil" size={12} color="#FFF" />
+            </View>
           </View>
           <View style={styles.profileInfo}>
-            <Text style={styles.name}>Soham Baviskar</Text>
-            <Text style={styles.role}>VPPCOE VA | Premium Account</Text>
+            <Text style={styles.name}>{userName || 'Soham Baviskar'}</Text>
+            <Text style={styles.role}>{t('collegeName')} | {t('premiumAccount')}</Text>
             <View style={styles.idBadge}>
               <Text style={styles.idText}>ID: VU1F2425052</Text>
             </View>
           </View>
         </View>
-
         {/* === PREFERENCES === */}
         <Text style={styles.sectionTitle}>{t('appPreferences')}</Text>
         <View style={styles.section}>
-          <SettingItem 
-            icon="language-outline" 
+          <SettingItem
+            icon="language-outline"
             title={`${t('language')} (${language.toUpperCase()})`}
-            onPress={handleLanguageChange} 
+            onPress={handleLanguageChange}
           />
           <View style={styles.divider} />
-          
-          <SettingItem 
-            icon="notifications-outline" 
-            title={t('irrigationAlerts')} 
+
+          <SettingItem
+            icon="notifications-outline"
+            title={t('irrigationAlerts')}
             value={notifications}
-            type="switch" 
+            type="switch"
             onPress={() => setNotifications(!notifications)}
           />
           <View style={styles.divider} />
 
-          <SettingItem 
-            icon="thunderstorm-outline" 
-            title={t('stormWarnings')} 
+          <SettingItem
+            icon="thunderstorm-outline"
+            title={t('stormWarnings')}
             value={stormAlerts}
-            type="switch" 
+            type="switch"
             onPress={() => setStormAlerts(!stormAlerts)}
-            color="#E64A19" // Red/Orange for Storms
+            color="#E64A19"
           />
           <View style={styles.divider} />
 
-          <SettingItem 
-            icon="finger-print-outline" 
-            title={t('biometricLogin')} 
+          <SettingItem
+            icon="finger-print-outline"
+            title={t('biometricLogin')}
             value={biometric}
-            type="switch" 
+            type="switch"
             onPress={() => setBiometric(!biometric)}
           />
         </View>
@@ -160,53 +169,53 @@ export default function SettingsScreen({ navigation }: any) {
         {/* === FARM CONFIGURATION === */}
         <Text style={styles.sectionTitle}>{t('farmSystem')}</Text>
         <View style={styles.section}>
-          <SettingItem 
-            icon="options-outline" 
-            title={t('configureFarmZones')} 
+          <SettingItem
+            icon="options-outline"
+            title={t('configureFarmZones')}
             onPress={() => navigation.navigate('FarmSetup')}
             color={colors.secondary}
           />
           <View style={styles.divider} />
 
-          <SettingItem 
-            icon="grid-outline" 
-            title={t('planSensors')} 
+          <SettingItem
+            icon="grid-outline"
+            title={t('planSensors')}
             onPress={() => navigation.navigate('SensorPlanner')}
             color={colors.primary}
           />
           <View style={styles.divider} />
 
-          <SettingItem 
-            icon="hardware-chip-outline" 
-            title={t('iotController')} 
-            value={t('connected')}
+          <SettingItem
+            icon="hardware-chip-outline"
+            title={t('iotController')}
+            value={t('connectedStatus')} // Key fixed
             color="#2E7D32"
             onPress={() => Alert.alert(t('status'), t('esp32Online'))}
           />
           <View style={styles.divider} />
-          
-          <SettingItem 
-            icon="location-outline" 
-            title={t('farmLocation')} 
-            value="Mumbai, IN"
-            onPress={() => {}}
+
+          <SettingItem
+            icon="location-outline"
+            title={t('farmLocation')}
+            value={t('farmCity')} // Dynamic Farm Location
+            onPress={() => navigation.navigate('FarmSetup')}
           />
         </View>
 
         {/* === SUPPORT === */}
         <Text style={styles.sectionTitle}>{t('support')}</Text>
         <View style={styles.section}>
-          <SettingItem 
-            icon="help-circle-outline" 
-            title={t('helpSupport')} 
-            onPress={() => {}}
-            color="#F57C00"
+          <SettingItem
+            icon="logo-whatsapp"
+            title={t('helpSupport')}
+            onPress={() => Linking.openURL('whatsapp://send?phone=+919876543210&text=Hi%20AgroSeva%20Support!')}
+            color="#25D366"
           />
           <View style={styles.divider} />
-          <SettingItem 
-            icon="information-circle-outline" 
-            title={t('aboutAgroseva')} 
-            value="v1.0.0"
+          <SettingItem
+            icon="information-circle-outline"
+            title={t('aboutAgroseva')}
+            value={t('appVersion')} // Dynamic Version
             onPress={() => Alert.alert("AgroSeva", `${t('builtBy')}\n${t('forSIH')}`)}
             color="#1976D2"
           />
@@ -219,78 +228,78 @@ export default function SettingsScreen({ navigation }: any) {
         </TouchableOpacity>
 
         <Text style={styles.footerText}>Agroseva © 2026 Tech Spartans</Text>
-        
-        {/* Extra bottom space for scrolling */}
-        <View style={{height: 100}} /> 
+        <View style={{ height: 100 }} />
 
-      </ScrollView>
-    </View>
+      </ScrollView >
+    </View >
   );
 }
+
+// ... styles unchanged ...
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#F4F6F8' },
 
   // === HEADER STYLES ===
-  header: { 
-    height: 180, 
-    paddingTop: 60, 
-    paddingHorizontal: 20, 
-    borderBottomLeftRadius: 30, 
+  header: {
+    height: 180,
+    paddingTop: 60,
+    paddingHorizontal: 20,
+    borderBottomLeftRadius: 30,
     borderBottomRightRadius: 30,
     position: 'absolute',
     top: 0,
     left: 0,
     width: width,
-    zIndex: 0, 
+    zIndex: 0,
   },
   headerTitle: { fontSize: 32, fontWeight: 'bold', color: '#FFF', marginTop: 10 },
 
   // === SCROLLVIEW STYLES ===
   scrollView: {
     flex: 1,
-    zIndex: 1, 
+    zIndex: 1,
   },
-  scrollContent: { 
+  scrollContent: {
     paddingHorizontal: 20,
     paddingTop: 180, // Push content down
   },
 
   // Profile Card
-  profileCard: { 
-    flexDirection: 'row', 
-    backgroundColor: '#FFF', 
-    padding: 20, 
-    borderRadius: 20, 
-    marginTop: -50, 
-    marginBottom: 25, 
-    elevation: 5, 
-    shadowColor: '#000', 
-    shadowOpacity: 0.1, 
-    shadowRadius: 10, 
-    alignItems: 'center' 
+  profileCard: {
+    flexDirection: 'row',
+    backgroundColor: '#FFF',
+    padding: 20,
+    borderRadius: 20,
+    marginTop: -50,
+    marginBottom: 25,
+    elevation: 5,
+    shadowColor: '#000',
+    shadowOpacity: 0.1,
+    shadowRadius: 10,
+    alignItems: 'center'
   },
   avatarContainer: { position: 'relative' },
   avatarText: { width: 60, height: 60, borderRadius: 30, backgroundColor: colors.primary, color: '#FFF', fontSize: 22, fontWeight: 'bold', textAlign: 'center', lineHeight: 60 },
   editBadge: { position: 'absolute', bottom: 0, right: 0, backgroundColor: '#333', width: 20, height: 20, borderRadius: 10, justifyContent: 'center', alignItems: 'center', borderWidth: 2, borderColor: '#FFF' },
-  
+
   profileInfo: { marginLeft: 15, flex: 1 },
   name: { fontSize: 18, fontWeight: 'bold', color: '#333' },
   role: { fontSize: 12, color: '#757575', marginBottom: 6 },
   idBadge: { backgroundColor: '#E8F5E9', alignSelf: 'flex-start', paddingHorizontal: 8, paddingVertical: 2, borderRadius: 6 },
   idText: { fontSize: 10, fontWeight: 'bold', color: '#2E7D32' },
 
-  // Sections
+  // Section
   sectionTitle: { fontSize: 14, fontWeight: 'bold', color: '#90A4AE', marginBottom: 10, marginLeft: 5, textTransform: 'uppercase', letterSpacing: 0.5 },
   section: { backgroundColor: '#FFF', borderRadius: 16, overflow: 'hidden', marginBottom: 25, elevation: 2 },
-  
+
   // Setting Item
   item: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', padding: 16, backgroundColor: '#FFF' },
   itemLeft: { flexDirection: 'row', alignItems: 'center' },
   iconBox: { width: 36, height: 36, borderRadius: 10, justifyContent: 'center', alignItems: 'center', marginRight: 15 },
   itemText: { fontSize: 16, color: '#333', fontWeight: '500' },
   valueText: { fontSize: 14, color: '#999', marginRight: 5 },
-  
+
   divider: { height: 1, backgroundColor: '#F5F5F5', marginLeft: 66 },
 
   // Logout

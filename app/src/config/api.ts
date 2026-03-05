@@ -19,7 +19,7 @@
 // 
 // Default: Auto-detected IP address (update if needed)
 // Your detected IP: 172.16.23.32
-export const LAPTOP_IP_ADDRESS = 'http://172.16.23.32:8000';
+export const LAPTOP_IP_ADDRESS = 'http://192.168.0.100:8000';
 
 // Irrigation Brain API endpoints
 export const IRRIGATION_BRAIN_API = {

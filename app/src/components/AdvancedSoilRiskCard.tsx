@@ -43,7 +43,7 @@ export const AdvancedSoilRiskCard: React.FC<AdvancedSoilRiskCardProps> = ({
   };
 
   // Get gradient colors based on risk level
-  const getGradientColors = (level: string): string[] => {
+  const getGradientColors = (level: string): readonly [string, string] => {
     switch (level) {
       case 'Healthy':
         return ['#4CAF50', '#388E3C'];
@@ -59,7 +59,7 @@ export const AdvancedSoilRiskCard: React.FC<AdvancedSoilRiskCardProps> = ({
   };
 
   // Get icon based on risk level
-  const getRiskIcon = (level: string): string => {
+  const getRiskIcon = (level: string): any => {
     switch (level) {
       case 'Healthy':
         return 'checkmark-circle';
@@ -131,7 +131,7 @@ export const AdvancedSoilRiskCard: React.FC<AdvancedSoilRiskCardProps> = ({
           {/* Stress Breakdown */}
           <View style={styles.breakdownSection}>
             <Text style={styles.sectionTitle}>{t('stressBreakdown')}</Text>
-            
+
             <View style={styles.breakdownItem}>
               <View style={styles.breakdownLabel}>
                 <Ionicons name="water" size={16} color="#1E88E5" />
