@@ -28,7 +28,7 @@ export interface ZonePlannerState {
 interface SensorPlannerState {
   // State per zone
   zones: Record<string, ZonePlannerState>;
-  
+
   // Current active zone
   activeZoneId: string | null;
 
@@ -183,6 +183,10 @@ export const useSensorPlannerStore = create<SensorPlannerState>((set, get) => ({
       Soil: 0,
       pH: 0,
       NPK: 0,
+      Moisture: 0,
+      Temperature: 0,
+      Arduino: 0,
+      ESP32: 0,
     };
 
     zone.installedSensors.forEach(sensor => {

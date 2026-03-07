@@ -22,7 +22,7 @@ export const useSensorStore = create<SensorState>((set, get) => {
       try {
         const data = await SensorService.fetchLiveSensors();
 
-        console.log("📡 Updating Store:", data); 
+        console.log("📡 Updating Store:", data);
 
         set({
           temperature: data.temperature ?? null,

@@ -17,11 +17,17 @@ import PHMonitoringScreen from '@/screens/PHMonitoringScreen';
 import FarmSetupScreen from '@/screens/FarmSetupScreen';
 import SensorPlannerScreen from '@/screens/SensorPlannerScreen';
 import CropSelectionScreen from '@/screens/CropSelectionScreen';
+import SchemesScreen from '@/screens/SchemesScreen';
+import { useTranslation } from '@/utils/i18n';
+import { useNotificationStore } from '@/store/useNotificationStore';
 
 // 1. Define the Tab Navigator (The Main App)
 const Tab = createBottomTabNavigator();
 
 function MainTabNavigator() {
+  const t = useTranslation();
+  const hasUnread = useNotificationStore((state) => state.hasUnread);
+
   return (
     <Tab.Navigator
       screenOptions={({ route }) => ({
@@ -31,27 +37,55 @@ function MainTabNavigator() {
         tabBarStyle: { height: 60, paddingBottom: 10 },
         tabBarIcon: ({ color, size }) => {
           let iconName: keyof typeof Ionicons.glyphMap = 'home';
-          if (route.name === 'Dashboard') iconName = 'grid';
-          else if (route.name === 'Monitor') iconName = 'pulse'; 
-          else if (route.name === 'pH Monitor') iconName = 'flask';
-          else if (route.name === 'Scan') iconName = 'scan-circle'; 
-          else if (route.name === 'Resources') iconName = 'water';
-          else if (route.name === 'Crops') iconName = 'leaf';
-          else if (route.name === 'Settings') iconName = 'settings';
+          if (route.name === t('tabDashboard')) iconName = 'grid';
+          else if (route.name === t('tabMonitor')) iconName = 'pulse';
+          else if (route.name === t('tabPhMonitor')) iconName = 'flask';
+          else if (route.name === t('tabScan')) iconName = 'scan-circle';
+          else if (route.name === t('tabResources')) iconName = 'water';
+          else if (route.name === t('tabCrops')) iconName = 'leaf';
+          else if (route.name === t('tabSettings')) iconName = 'settings';
           return <Ionicons name={iconName} size={size} color={color} />;
         },
       })}
     >
-      <Tab.Screen name="Dashboard" component={DashboardScreen} />
-      <Tab.Screen name="Monitor" component={MonitorScreen} />
-      <Tab.Screen name="pH Monitor" component={PHMonitoringScreen} />
-      <Tab.Screen name="Scan" component={CameraScreen} />
-      <Tab.Screen name="Resources" component={ResourcesScreen} />
-      <Tab.Screen name="Crops" component={CropSelectionScreen} />
-      <Tab.Screen name="Settings" component={SettingsScreen} />
+      <Tab.Screen
+        name={t('tabDashboard')}
+        component={DashboardScreen}
+        options={{ tabBarLabel: t('tabDashboard') }}
+      />
+      <Tab.Screen
+        name={t('tabMonitor')}
+        component={MonitorScreen}
+        options={{ tabBarLabel: t('tabMonitor') }}
+      />
+      <Tab.Screen
+        name={t('tabPhMonitor')}
+        component={PHMonitoringScreen}
+        options={{ tabBarLabel: t('tabPhMonitor') }}
+      />
+      <Tab.Screen
+        name={t('tabScan')}
+        component={CameraScreen}
+        options={{ tabBarLabel: t('tabScan') }}
+      />
+      <Tab.Screen
+        name={t('tabResources')}
+        component={ResourcesScreen}
+        options={{ tabBarLabel: t('tabResources') }}
+      />
+      <Tab.Screen
+        name={t('tabCrops')}
+        component={CropSelectionScreen}
+        options={{ tabBarLabel: t('tabCrops') }}
+      />
+      <Tab.Screen
+        name={t('tabSettings')}
+        component={SettingsScreen}
+        options={{ tabBarLabel: t('tabSettings') }}
+      />
     </Tab.Navigator>
   );
-  }
+}
 
 // 2. Define the Root Stack (Login -> Tabs)
 const Stack = createNativeStackNavigator();
@@ -60,14 +94,15 @@ export default function AppNavigator() {
   return (
     <NavigationContainer>
       <Stack.Navigator screenOptions={{ headerShown: false }}>
-        
+
         {/* Login -> OTP -> Tabs */}
         <Stack.Screen name="Login" component={LoginScreen} />
-        <Stack.Screen name="OtpVerification" component={OtpScreen} /> 
+        <Stack.Screen name="OtpVerification" component={OtpScreen} />
         <Stack.Screen name="MainTabs" component={MainTabNavigator} />
         <Stack.Screen name="FarmSetup" component={FarmSetupScreen} />
         <Stack.Screen name="SensorPlanner" component={SensorPlannerScreen} />
-        
+        <Stack.Screen name="Schemes" component={SchemesScreen} />
+
       </Stack.Navigator>
     </NavigationContainer>
   );

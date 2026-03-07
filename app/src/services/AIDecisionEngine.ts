@@ -1,5 +1,6 @@
 // src/services/AIDecisionEngine.ts
 import { useStore } from '@/store/useStore';
+import { t } from '@/utils/i18n';
 
 export interface AIRecommendation {
   action: 'IRRIGATE' | 'FERTILIZE' | 'WAIT' | 'SAFE';
@@ -21,8 +22,8 @@ export const AIDecisionEngine = {
       return {
         action: 'WAIT',
         confidence: 92,
-        reason: 'Rain Forecasted Soon',
-        details: 'Soil is dry (40%), but rain is expected in 24h. Skipping irrigation to save water.',
+        reason: t('rainSoon'),
+        details: t('rainSoonDesc'),
       };
     }
 
@@ -31,8 +32,8 @@ export const AIDecisionEngine = {
       return {
         action: 'IRRIGATE',
         confidence: 98,
-        reason: 'Critical Soil Moisture',
-        details: `Moisture is critical (${moisture.toFixed(1)}%). No rain forecast. Pump activation recommended.`,
+        reason: t('critical'),
+        details: t('criticalDesc', { moisture: moisture.toFixed(1) }),
       };
     }
 
@@ -41,8 +42,8 @@ export const AIDecisionEngine = {
       return {
         action: 'FERTILIZE',
         confidence: 85,
-        reason: 'Nutrient Deficiency',
-        details: 'N-P-K levels are below optimal range. Recommended NPK 19:19:19 blend.',
+        reason: t('nutrientDef'),
+        details: t('nutrientDesc'),
       };
     }
 
@@ -50,8 +51,8 @@ export const AIDecisionEngine = {
     return {
       action: 'SAFE',
       confidence: 100,
-      reason: 'Optimal Conditions',
-      details: 'Soil moisture and nutrient levels are healthy. No action required.',
+      reason: t('optimal'),
+      details: t('optimalDesc'),
     };
   }
 };

@@ -48,9 +48,9 @@ export default function PHMonitoringScreen() {
   const getStatusLabel = () => {
     if (!phStatus) return t('waitingForData');
     switch (phStatus) {
-      case 'acidic': return 'Acidic Soil (< 6.0)';
-      case 'optimal': return 'Optimal Soil (6.0 - 7.5)';
-      case 'alkaline': return 'Alkaline Soil (> 7.5)';
+      case 'acidic': return `${t('acidic')} Soil (< 6.0)`;
+      case 'optimal': return `${t('ideal')} Soil (6.0 - 7.5)`;
+      case 'alkaline': return `${t('alkaline')} Soil (> 7.5)`;
       default: return t('unknown');
     }
   };
@@ -95,7 +95,7 @@ export default function PHMonitoringScreen() {
                     {pH !== null ? pH.toFixed(1) : '--'}
                   </Text>
                 )}
-                <Text style={styles.heroUnit}>pH Level</Text>
+                <Text style={styles.heroUnit}>{t('phLevel')}</Text>
               </View>
             </View>
 
@@ -128,15 +128,15 @@ export default function PHMonitoringScreen() {
           <View style={styles.card}>
             <View style={styles.scaleContainer}>
               <View style={[styles.scalePart, { backgroundColor: '#FF5252', borderTopLeftRadius: 10, borderBottomLeftRadius: 10 }]}>
-                <Text style={styles.scaleLabel}>Acidic</Text>
+                <Text style={styles.scaleLabel}>{t('acidic')}</Text>
                 <Text style={styles.scaleVal}>0-6</Text>
               </View>
               <View style={[styles.scalePart, { backgroundColor: '#66BB6A' }]}>
-                <Text style={styles.scaleLabel}>Ideal</Text>
+                <Text style={styles.scaleLabel}>{t('ideal')}</Text>
                 <Text style={styles.scaleVal}>6-7.5</Text>
               </View>
               <View style={[styles.scalePart, { backgroundColor: '#42A5F5', borderTopRightRadius: 10, borderBottomRightRadius: 10 }]}>
-                <Text style={styles.scaleLabel}>Alkaline</Text>
+                <Text style={styles.scaleLabel}>{t('alkaline')}</Text>
                 <Text style={styles.scaleVal}>7.5+</Text>
               </View>
             </View>
@@ -150,7 +150,7 @@ export default function PHMonitoringScreen() {
                 alignItems: 'center'
               }}>
                 <Ionicons name="caret-up" size={24} color="#333" />
-                <Text style={{ fontSize: 12, fontWeight: 'bold', color: '#333' }}>You</Text>
+                <Text style={{ fontSize: 12, fontWeight: 'bold', color: '#333' }}>{t('current')}</Text>
               </View>
             )}
           </View>
@@ -190,14 +190,14 @@ export default function PHMonitoringScreen() {
               <MaterialCommunityIcons name="sprout" size={32} color={getStatusColor()} />
               <View style={{ marginLeft: 15, flex: 1 }}>
                 <Text style={styles.recTitle}>
-                  {phStatus === 'acidic' ? 'Add Lime (Choona)' :
-                    phStatus === 'alkaline' ? 'Add Gypsum/Sulfur' :
-                      'Maintain Current State'}
+                  {phStatus === 'acidic' ? t('addLime') :
+                    phStatus === 'alkaline' ? t('addGypsum') :
+                      t('maintainState')}
                 </Text>
                 <Text style={styles.recDesc}>
-                  {phStatus === 'acidic' ? 'Soil is too acidic. Adding lime will raise pH to optimal levels.' :
-                    phStatus === 'alkaline' ? 'Soil is too alkaline. Gypsum helps neutralize the soil.' :
-                      'Soil pH is perfect for most crops. No action needed.'}
+                  {phStatus === 'acidic' ? t('acidicDesc') :
+                    phStatus === 'alkaline' ? t('alkalineDesc') :
+                      t('optimalPhDesc')}
                 </Text>
               </View>
             </View>
@@ -205,7 +205,7 @@ export default function PHMonitoringScreen() {
 
         </View>
       </ScrollView>
-    </View>
+    </View >
   );
 }
 

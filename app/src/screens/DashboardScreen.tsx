@@ -6,6 +6,8 @@ import { LinearGradient } from 'expo-linear-gradient';
 
 // Stores
 import { useStore } from '../store/useStore';
+import { useNotificationStore } from '../store/useNotificationStore';
+import { useUserStore } from '../store/useUserStore';
 import { usePHStore } from '../store/usePHStore'; // Real pH Sensor
 import { useMoistureStore } from '../store/useMoistureStore'; // Real Moisture Sensor
 import { useStatusStore } from '../store/useStatusStore'; // Status with yield data
@@ -30,12 +32,23 @@ const { width } = Dimensions.get('window');
 export default function DashboardScreen({ navigation }: any) {
   // --- STORES ---
   const { soilData, weather: storeWeather } = useStore();
+  const { name: userName } = useUserStore();
   const { pH: realPH, fetchPH, startPolling: startPHPolling, stopPolling: stopPHPolling } = usePHStore(); // Real pH
   const { moisture: realMoisture, startPolling: startMoisturePolling, stopPolling: stopMoisturePolling } = useMoistureStore(); // Real Moisture
   const { irrigation, yield: yieldData, startPolling: startStatusPolling, stopPolling: stopStatusPolling } = useStatusStore(); // Status (for irrigation state and yield)
   const { zones, getLatestDecision } = useFarmSetupStore(); // Farm Zones
   const { temperature: sensorTemp, humidity: sensorHumidity } = useSensorStore();
   const t = useTranslation(); // Global translations
+  const addAlert = useNotificationStore((state) => state.addAlert);
+
+  const getInitials = (name: string) => {
+    return name
+      .split(' ')
+      .map((n) => n[0])
+      .join('')
+      .substring(0, 2)
+      .toUpperCase();
+  };
 
   // --- STATE ---
   const [refreshing, setRefreshing] = useState(false);
@@ -154,7 +167,7 @@ export default function DashboardScreen({ navigation }: any) {
         <LinearGradient colors={[colors.primary, '#004D40']} style={styles.header}>
           <View style={styles.headerTop}>
             <View>
-              <Text style={styles.greeting}>{t('greeting')}</Text>
+              <Text style={styles.greeting}>Namaste, {userName.split(' ')[0]}</Text>
               <View style={styles.locationBadge}>
                 <Ionicons name="location-sharp" size={14} color="#FFF" />
                 <Text style={styles.location}>{t('location')}</Text>
@@ -162,7 +175,7 @@ export default function DashboardScreen({ navigation }: any) {
             </View>
             <TouchableOpacity onPress={() => navigation.navigate('Settings')}>
               <View style={styles.profileCircle}>
-                <Text style={styles.profileInitials}>SB</Text>
+                <Text style={styles.profileInitials}>{getInitials(userName || 'Farmer')}</Text>
               </View>
             </TouchableOpacity>
           </View>
@@ -363,6 +376,13 @@ export default function DashboardScreen({ navigation }: any) {
                 <Ionicons name="grid-outline" size={22} color="#FFF" />
               </LinearGradient>
               <Text style={styles.quickText}>{t('planSensors')}</Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity style={styles.quickBtn} onPress={() => navigation.navigate('Schemes')}>
+              <LinearGradient colors={['#FBC02D', '#F57F17']} style={styles.quickIcon}>
+                <Ionicons name="documents-outline" size={22} color="#FFF" />
+              </LinearGradient>
+              <Text style={styles.quickText}>Gov Schemes</Text>
             </TouchableOpacity>
           </ScrollView>
 

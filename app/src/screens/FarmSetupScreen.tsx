@@ -14,11 +14,13 @@ import {
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useFarmSetupStore } from '@/store/useFarmSetupStore';
+import { useTranslation } from '@/utils/i18n';
 import { colors } from '@/theme/colors';
 import { ZONES } from '@/utils/constants';
 import { SoilType } from '@/models/FarmSetup';
 
 export default function FarmSetupScreen({ navigation }: any) {
+  const t = useTranslation();
   const { zones, loading, error, addZone, fetchCropStandards, loadFromStorage } = useFarmSetupStore();
 
   const [zoneId, setZoneId] = useState('');
@@ -35,25 +37,25 @@ export default function FarmSetupScreen({ navigation }: any) {
   const handleSubmit = async () => {
     // Validation
     if (!zoneId.trim() || !zoneName.trim()) {
-      Alert.alert('Error', 'Please enter Zone ID and Zone Name');
+      Alert.alert(t('errorTitle'), t('enterZoneId'));
       return;
     }
 
     if (!cropName.trim()) {
-      Alert.alert('Error', 'Please enter Crop Name');
+      Alert.alert(t('errorTitle'), t('enterCropName'));
       return;
     }
 
     const area = parseFloat(farmArea);
     if (!farmArea.trim() || isNaN(area) || area <= 0) {
-      Alert.alert('Error', 'Please enter a valid farm area in acres');
+      Alert.alert(t('errorTitle'), t('enterFarmArea'));
       return;
     }
 
     // Check if zone already exists
     const existingZone = zones.find(z => z.zoneId === zoneId);
     if (existingZone) {
-      Alert.alert('Error', `Zone ${zoneId} already exists`);
+      Alert.alert(t('errorTitle'), t('zoneExists').replace('{id}', zoneId));
       return;
     }
 
@@ -73,9 +75,9 @@ export default function FarmSetupScreen({ navigation }: any) {
       // But we can also call it explicitly to show loading
       await fetchCropStandards(zoneId.trim(), cropName.trim());
 
-      Alert.alert('Success', 'Farm setup completed! Crop standards fetched from AI.', [
+      Alert.alert(t('successTitle'), t('farmSetupComplete'), [
         {
-          text: 'OK',
+          text: t('ok'),
           onPress: () => {
             // Reset form
             setZoneId('');
@@ -89,7 +91,7 @@ export default function FarmSetupScreen({ navigation }: any) {
         },
       ]);
     } catch (error: any) {
-      Alert.alert('Error', error.message || 'Failed to setup farm');
+      Alert.alert(t('errorTitle'), error.message || t('failedSetupFarm'));
     } finally {
       setSubmitting(false);
     }
@@ -106,13 +108,13 @@ export default function FarmSetupScreen({ navigation }: any) {
         <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
           <Ionicons name="arrow-back" size={24} color={colors.text} />
         </TouchableOpacity>
-        <Text style={styles.title}>Farm Setup</Text>
-        <Text style={styles.subtitle}>Configure zone and crop details</Text>
+        <Text style={styles.title}>{t('farmSetup')}</Text>
+        <Text style={styles.subtitle}>{t('configureZoneCrop')}</Text>
       </View>
 
       {/* Quick Zone Selection */}
       <View style={styles.section}>
-        <Text style={styles.sectionTitle}>Quick Select Zone</Text>
+        <Text style={styles.sectionTitle}>{t('quickSelectZone')}</Text>
         <View style={styles.zoneGrid}>
           {ZONES.map(zone => (
             <TouchableOpacity
@@ -138,10 +140,10 @@ export default function FarmSetupScreen({ navigation }: any) {
 
       {/* Form */}
       <View style={styles.section}>
-        <Text style={styles.sectionTitle}>Zone Details</Text>
+        <Text style={styles.sectionTitle}>{t('zoneDetails')}</Text>
 
         <View style={styles.inputGroup}>
-          <Text style={styles.label}>Zone ID *</Text>
+          <Text style={styles.label}>{t('zoneIdLabel')}</Text>
           <TextInput
             style={styles.input}
             placeholder="e.g., zone_1"
@@ -152,7 +154,7 @@ export default function FarmSetupScreen({ navigation }: any) {
         </View>
 
         <View style={styles.inputGroup}>
-          <Text style={styles.label}>Zone Name *</Text>
+          <Text style={styles.label}>{t('zoneNameLabel')}</Text>
           <TextInput
             style={styles.input}
             placeholder="e.g., North Field"
@@ -163,7 +165,7 @@ export default function FarmSetupScreen({ navigation }: any) {
         </View>
 
         <View style={styles.inputGroup}>
-          <Text style={styles.label}>Crop Name *</Text>
+          <Text style={styles.label}>{t('cropNameLabel')}</Text>
           <TextInput
             style={styles.input}
             placeholder="e.g., Wheat, Rice, Cotton"
@@ -173,12 +175,12 @@ export default function FarmSetupScreen({ navigation }: any) {
             autoCapitalize="words"
           />
           <Text style={styles.hint}>
-            AI will fetch optimal standards for this crop
+            {t('aiFetchHint').replace('* ', '')}
           </Text>
         </View>
 
         <View style={styles.inputGroup}>
-          <Text style={styles.label}>Farm Area (acres) *</Text>
+          <Text style={styles.label}>{t('farmArea')} ({t('acres')}) *</Text>
           <TextInput
             style={styles.input}
             placeholder="e.g., 5.5"
@@ -190,7 +192,7 @@ export default function FarmSetupScreen({ navigation }: any) {
         </View>
 
         <View style={styles.inputGroup}>
-          <Text style={styles.label}>Soil Type *</Text>
+          <Text style={styles.label}>{t('soilTypeLabel')}</Text>
           <View style={styles.soilTypeContainer}>
             {(['sandy', 'loamy', 'clay'] as SoilType[]).map(type => (
               <TouchableOpacity
@@ -208,7 +210,7 @@ export default function FarmSetupScreen({ navigation }: any) {
                     soilType === type && styles.soilTypeTextActive,
                   ]}
                 >
-                  {type.charAt(0).toUpperCase() + type.slice(1)}
+                  {t(type as any)}
                 </Text>
               </TouchableOpacity>
             ))}
@@ -219,23 +221,23 @@ export default function FarmSetupScreen({ navigation }: any) {
       {/* Existing Zones */}
       {zones.length > 0 && (
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Configured Zones ({zones.length})</Text>
+          <Text style={styles.sectionTitle}>{t('configuredZones')} ({zones.length})</Text>
           {zones.map(zone => (
             <View key={zone.zoneId} style={styles.zoneCard}>
               <Text style={styles.zoneCardTitle}>{zone.zoneName}</Text>
-              <Text style={styles.zoneCardText}>Crop: {zone.cropName}</Text>
+              <Text style={styles.zoneCardText}>{t('cropType')}: {zone.cropName}</Text>
               <Text style={styles.zoneCardText}>
-                Area: {zone.farmArea} acres | Soil: {zone.soilType}
+                {t('farmArea')}: {zone.farmArea} {t('acres')} | {t('soilTypeLabel')}: {t(zone.soilType as any)}
               </Text>
               {zone.cropStandards ? (
                 <View style={styles.standardsBadge}>
                   <Ionicons name="checkmark-circle" size={16} color={colors.success} />
-                  <Text style={styles.standardsText}>Standards loaded</Text>
+                  <Text style={styles.standardsText}>{t('standardsLoaded')}</Text>
                 </View>
               ) : (
                 <View style={styles.standardsBadge}>
                   <ActivityIndicator size="small" color={colors.primary} />
-                  <Text style={styles.standardsText}>Loading standards...</Text>
+                  <Text style={styles.standardsText}>{t('loadingStandards')}</Text>
                 </View>
               )}
             </View>
@@ -261,7 +263,7 @@ export default function FarmSetupScreen({ navigation }: any) {
           <ActivityIndicator color="#FFF" />
         ) : (
           <>
-            <Text style={styles.submitButtonText}>Save & Fetch Crop Standards</Text>
+            <Text style={styles.submitButtonText}>{t('saveFetchStandards')}</Text>
             <Ionicons name="arrow-forward" size={20} color="#FFF" />
           </>
         )}
@@ -269,7 +271,7 @@ export default function FarmSetupScreen({ navigation }: any) {
 
       <View style={styles.footer}>
         <Text style={styles.footerText}>
-          * Crop standards will be fetched from Gemini AI (one-time per crop)
+          {t('aiFetchHint')}
         </Text>
       </View>
     </ScrollView>

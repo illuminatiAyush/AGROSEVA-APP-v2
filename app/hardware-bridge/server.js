@@ -28,7 +28,7 @@ let lastUpdateTime = null;
 // TODO: Update COM_PORT to match your Arduino's port
 // Windows: COM3, COM4, etc.
 // Mac/Linux: /dev/tty.usbserial-*, /dev/ttyUSB0, etc.
-const COM_PORT = process.env.COM_PORT || 'COM4'; // Default to COM3 on Windows
+const COM_PORT = process.env.COM_PORT || 'COM9'; // Default to COM3 on Windows
 const BAUD_RATE = 9600;
 
 console.log('🔌 Starting Hardware Bridge...');
@@ -161,4 +161,3 @@ process.on('SIGINT', () => {
   }
   process.exit(0);
 });
-

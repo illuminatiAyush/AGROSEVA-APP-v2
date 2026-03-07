@@ -33,6 +33,7 @@ import { useSensorPlannerStore, InstalledSensor } from '@/store/useSensorPlanner
 import { CropType, SensorType, SENSOR_COSTS } from '@/ai/SensorPlanningEngine';
 import { colors } from '@/theme/colors';
 import { ZONES } from '@/utils/constants';
+import { useTranslation } from '@/utils/i18n';
 
 // ─── Layout Constants ───────────────────────────────────────────────────────
 const { width, height } = Dimensions.get('window');
@@ -40,13 +41,16 @@ const CANVAS_WIDTH = width;
 const CANVAS_HEIGHT = height * 0.48;
 const GRID_STEP = 30; // px — sensors snap to multiples of this
 const SENSOR_RADIUS = 22; // half of sensor dot size
-const ACRES_TO_PX = 55; // 1 acre → this many pixels of boundary side
+// ACRES_TO_PX removed — boundary box not rendered on canvas (kept clean)
 
-// ─── Sensor Meta ─────────────────────────────────────────────────────────────
 const SENSOR_CONFIGS: Record<SensorType, { icon: string; color: string; label: string }> = {
-  Soil: { icon: 'leaf', color: '#43A047', label: 'Soil' },
-  pH: { icon: 'flask', color: '#8E24AA', label: 'pH' },
-  NPK: { icon: 'analytics', color: '#EF6C00', label: 'NPK' },
+  Soil: { icon: 'leaf', color: '#2E7D32', label: 'Soil' },
+  pH: { icon: 'flask', color: '#6A1B9A', label: 'pH' },
+  NPK: { icon: 'analytics', color: '#E65100', label: 'NPK' },
+  Moisture: { icon: 'water', color: '#0277BD', label: 'Moisture' },
+  Temperature: { icon: 'thermometer', color: '#C62828', label: 'Temp' },
+  Arduino: { icon: 'hardware-chip', color: '#00695C', label: 'Arduino' },
+  ESP32: { icon: 'wifi', color: '#1565C0', label: 'Wi-Fi Hub' },
 };
 
 // ─── Snap Helper ─────────────────────────────────────────────────────────────
@@ -109,6 +113,8 @@ export default function SensorPlannerScreen({ navigation }: any) {
     getZoneState,
     loadFromStorage,
   } = useSensorPlannerStore();
+
+  const t = useTranslation();
 
   const [selectedCrop, setSelectedCrop] = useState<CropType | null>(null);
   const [areaInput, setAreaInput] = useState('');
@@ -187,12 +193,12 @@ export default function SensorPlannerScreen({ navigation }: any) {
   // Validates inputs → shows 1-second "Syncing..." loader → calls recalculateVerdict
   const handleNext = useCallback(() => {
     if (!selectedCrop) {
-      Alert.alert('Missing Info', 'Please select a Crop Type first.');
+      Alert.alert(t('errorTitle'), t('enterCropName'));
       return;
     }
     const area = parseFloat(areaInput);
     if (!area || area <= 0) {
-      Alert.alert('Missing Info', 'Please enter a valid Farm Area (e.g. 2.5 acres).');
+      Alert.alert(t('errorTitle'), t('enterFarmArea'));
       return;
     }
     // Show loader immediately
@@ -281,10 +287,10 @@ export default function SensorPlannerScreen({ navigation }: any) {
 
   // ── Remove sensor ────────────────────────────────────────────────────────
   const handleRemoveSensor = (sensorId: string) => {
-    Alert.alert('Remove Sensor', 'Remove this sensor from the plan?', [
-      { text: 'Cancel', style: 'cancel' },
+    Alert.alert(t('removeSensorTitle'), t('removeSensorQuestion'), [
+      { text: t('cancel'), style: 'cancel' },
       {
-        text: 'Remove',
+        text: t('remove'),
         style: 'destructive',
         onPress: () => {
           delete panRefs.current[sensorId];
@@ -330,8 +336,8 @@ export default function SensorPlannerScreen({ navigation }: any) {
             <Ionicons name="arrow-back" size={22} color="#FFF" />
           </TouchableOpacity>
           <View>
-            <Text style={styles.headerTitle}>Plan Sensors</Text>
-            <Text style={styles.headerSub}>Architectural Blueprint</Text>
+            <Text style={styles.headerTitle}>{t('planSensorsTitle')}</Text>
+            <Text style={styles.headerSub}>{t('blueprintSub')}</Text>
           </View>
           <TouchableOpacity onPress={() => clearZone(selectedZoneId)} style={styles.headerBtn}>
             <Ionicons name="refresh-circle" size={26} color="#A5D6A7" />
@@ -352,7 +358,7 @@ export default function SensorPlannerScreen({ navigation }: any) {
           {farmArea > 0 && (
             <View pointerEvents="none" style={styles.farmInfoOverlay}>
               <Ionicons name="expand-outline" size={11} color="rgba(255,255,255,0.8)" />
-              <Text style={styles.farmInfoText}>{farmArea} Acres</Text>
+              <Text style={styles.farmInfoText}>{farmArea} {t('acres')}</Text>
             </View>
           )}
 
@@ -394,29 +400,38 @@ export default function SensorPlannerScreen({ navigation }: any) {
             return (
               <Animated.View
                 key={sensor.id}
+                pointerEvents="box-none"
                 style={[
-                  styles.sensorDot,
+                  styles.sensorDotContainer,
                   {
                     transform: pan.getTranslateTransform(),
-                    backgroundColor: cfg.color,
                     zIndex: isBeingDragged ? 20 : 10,
-                    opacity: isBeingDragged ? 0.85 : 1,
-                    shadowColor: cfg.color,
-                    shadowOpacity: isBeingDragged ? 0.6 : 0.3,
                   },
                 ]}
-                {...pr.panHandlers}
               >
-                <Ionicons name={cfg.icon as any} size={18} color="#FFF" />
-                <Text style={styles.sensorDotLabel}>{cfg.label[0]}</Text>
+                <View
+                  style={[
+                    styles.sensorDot,
+                    {
+                      backgroundColor: cfg.color,
+                      opacity: isBeingDragged ? 0.85 : 1,
+                      shadowColor: cfg.color,
+                      shadowOpacity: isBeingDragged ? 0.6 : 0.3,
+                    },
+                  ]}
+                  {...pr.panHandlers}
+                >
+                  <Ionicons name={cfg.icon as any} size={18} color="#FFF" />
+                  <Text style={styles.sensorDotLabel}>{cfg.label[0]}</Text>
+                </View>
 
-                {/* Remove button */}
+                {/* Remove button - sibling to the dot but inside the same animated container */}
                 <TouchableOpacity
                   style={styles.removeBtn}
                   onPress={() => handleRemoveSensor(sensor.id)}
-                  hitSlop={{ top: 8, left: 8, right: 8, bottom: 8 }}
+                  hitSlop={{ top: 12, left: 12, right: 12, bottom: 12 }}
                 >
-                  <Ionicons name="close-circle" size={17} color="#FFF" />
+                  <Ionicons name="close-circle" size={18} color="#FFF" />
                 </TouchableOpacity>
               </Animated.View>
             );
@@ -426,7 +441,7 @@ export default function SensorPlannerScreen({ navigation }: any) {
           {(!zoneState || zoneState.installedSensors.length === 0) && (
             <View style={styles.emptyHint} pointerEvents="none">
               <Ionicons name="add-circle-outline" size={32} color="#B0BEC5" />
-              <Text style={styles.emptyHintText}>Tap a sensor below{'\n'}to place it on the grid</Text>
+              <Text style={styles.emptyHintText}>{t('emptyPlannerHint')}</Text>
             </View>
           )}
         </View>
@@ -442,32 +457,78 @@ export default function SensorPlannerScreen({ navigation }: any) {
 
       {/* ── SENSOR TRAY ── */}
       <View style={styles.tray}>
-        <Text style={styles.trayTitle}>Tap to Add   ·   Drag on Canvas</Text>
-        <View style={styles.trayRow}>
-          {(['Soil', 'pH', 'NPK'] as SensorType[]).map(type => {
-            const cfg = SENSOR_CONFIGS[type];
-            const count = zoneState?.installedSensors.filter(s => s.type === type).length || 0;
-            return (
-              <TouchableOpacity
-                key={type}
-                style={[styles.trayItem, { borderColor: cfg.color }]}
-                onPress={() => handleTrayTap(type)}
-                activeOpacity={0.75}
-              >
-                <View style={[styles.trayIcon, { backgroundColor: cfg.color + '20' }]}>
-                  <Ionicons name={cfg.icon as any} size={24} color={cfg.color} />
-                </View>
-                <Text style={[styles.trayLabel, { color: cfg.color }]}>{cfg.label}</Text>
-                <Text style={styles.trayCost}>₹{SENSOR_COSTS[type].toLocaleString()}</Text>
-                {count > 0 && (
-                  <View style={[styles.trayBadge, { backgroundColor: cfg.color }]}>
-                    <Text style={styles.trayBadgeText}>{count}</Text>
-                  </View>
-                )}
-              </TouchableOpacity>
-            );
-          })}
-        </View>
+        <Text style={styles.trayTitle}>Tap a sensor below to place it on your field map - Slide For more sensors. </Text>
+
+        <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.trayScroll}>
+          {/* Group 1: Smart Probes */}
+          <View style={styles.trayGroup}>
+            <View style={styles.trayGroupHeader}>
+              <Text style={styles.trayGroupEmoji}>🌱</Text>
+              <Text style={styles.trayGroupTitle}>Farm Sensors</Text>
+            </View>
+            <View style={styles.trayRow}>
+              {(['Soil', 'pH', 'NPK', 'Moisture', 'Temperature'] as SensorType[]).map(type => {
+                const cfg = SENSOR_CONFIGS[type];
+                const count = zoneState?.installedSensors.filter(s => s.type === type).length || 0;
+                return (
+                  <TouchableOpacity
+                    key={type}
+                    style={[styles.trayItem, { borderColor: cfg.color }]}
+                    onPress={() => handleTrayTap(type)}
+                    activeOpacity={0.75}
+                  >
+                    <View style={[styles.trayIcon, { backgroundColor: cfg.color + '22' }]}>
+                      <Ionicons name={cfg.icon as any} size={22} color={cfg.color} />
+                    </View>
+                    <Text style={[styles.trayLabel, { color: cfg.color }]}>{cfg.label}</Text>
+                    <Text style={styles.trayCost}>₹{SENSOR_COSTS[type].toLocaleString()}</Text>
+                    {count > 0 && (
+                      <View style={[styles.trayBadge, { backgroundColor: cfg.color }]}>
+                        <Text style={styles.trayBadgeText}>{count}</Text>
+                      </View>
+                    )}
+                  </TouchableOpacity>
+                );
+              })}
+            </View>
+          </View>
+
+          {/* Separator */}
+          <View style={styles.traySeparator} />
+
+          {/* Group 2: Network Hubs */}
+          <View style={styles.trayGroup}>
+            <View style={styles.trayGroupHeader}>
+              <Text style={styles.trayGroupEmoji}>📡</Text>
+              <Text style={styles.trayGroupTitle}>Data Hubs</Text>
+            </View>
+            <View style={styles.trayRow}>
+              {(['Arduino', 'ESP32'] as SensorType[]).map(type => {
+                const cfg = SENSOR_CONFIGS[type];
+                const count = zoneState?.installedSensors.filter(s => s.type === type).length || 0;
+                return (
+                  <TouchableOpacity
+                    key={type}
+                    style={[styles.trayItem, { borderColor: cfg.color }]}
+                    onPress={() => handleTrayTap(type)}
+                    activeOpacity={0.75}
+                  >
+                    <View style={[styles.trayIcon, { backgroundColor: cfg.color + '22' }]}>
+                      <Ionicons name={cfg.icon as any} size={22} color={cfg.color} />
+                    </View>
+                    <Text style={[styles.trayLabel, { color: cfg.color }]}>{cfg.label}</Text>
+                    <Text style={styles.trayCost}>₹{SENSOR_COSTS[type].toLocaleString()}</Text>
+                    {count > 0 && (
+                      <View style={[styles.trayBadge, { backgroundColor: cfg.color }]}>
+                        <Text style={styles.trayBadgeText}>{count}</Text>
+                      </View>
+                    )}
+                  </TouchableOpacity>
+                );
+              })}
+            </View>
+          </View>
+        </ScrollView>
       </View>
 
       {/* ── SCROLLABLE SECTION: Inputs + Verdict ── */}
@@ -475,7 +536,7 @@ export default function SensorPlannerScreen({ navigation }: any) {
 
         {/* Farm Details */}
         <View style={styles.card}>
-          <Text style={styles.cardTitle}>Farm Details</Text>
+          <Text style={styles.cardTitle}>{t('farmDetails')}</Text>
 
           {/* Zone selector */}
           <Text style={styles.inputLabel}>Zone</Text>
@@ -515,7 +576,7 @@ export default function SensorPlannerScreen({ navigation }: any) {
             style={styles.textInput}
             value={areaInput}
             onChangeText={setAreaInput}
-            placeholder="Enter area (e.g. 2.5)"
+            placeholder={t('enterAreaPlaceholder')}
             keyboardType="numeric"
             placeholderTextColor="#B0BEC5"
           />
@@ -536,11 +597,11 @@ export default function SensorPlannerScreen({ navigation }: any) {
             activeOpacity={0.8}
           >
             {isCalculating ? (
-              <Text style={styles.nextBtnText}>Syncing…</Text>
+              <Text style={styles.nextBtnText}>{t('syncing')}</Text>
             ) : (
               <>
                 <Text style={styles.nextBtnText}>
-                  {isStepValidated ? '✓ Recalculate AI' : 'Next → Get AI Recommendations'}
+                  {isStepValidated ? t('recalculateAi') : t('nextGetAiRec')}
                 </Text>
               </>
             )}
@@ -551,7 +612,7 @@ export default function SensorPlannerScreen({ navigation }: any) {
         {isCalculating && (
           <View style={styles.loadingPanel}>
             <Ionicons name="sync" size={22} color="#1565C0" />
-            <Text style={styles.loadingText}>Syncing with AI… Please wait</Text>
+            <Text style={styles.loadingText}>{t('syncingAiWait')}</Text>
           </View>
         )}
 
@@ -580,19 +641,19 @@ export default function SensorPlannerScreen({ navigation }: any) {
             {/* Metrics row */}
             <View style={styles.metricsRow}>
               <View style={styles.metricItem}>
-                <Text style={styles.metricValue}>{verdict.accuracyLabel}</Text>
-                <Text style={styles.metricSub}>Accuracy ({verdict.accuracy}%)</Text>
+                <Text style={styles.metricValue}>{t(verdict.accuracyLabel as any) || verdict.accuracyLabel}</Text>
+                <Text style={styles.metricSub}>{t('accuracy')} ({verdict.accuracy}%)</Text>
               </View>
               <View style={styles.metricDivider} />
               <View style={styles.metricItem}>
                 <Text style={styles.metricValue}>₹{verdict.totalCost.toLocaleString()}</Text>
-                <Text style={styles.metricSub}>Total Cost</Text>
+                <Text style={styles.metricSub}>{t('totalCost')}</Text>
               </View>
             </View>
 
             {/* Details toggle */}
             <TouchableOpacity style={styles.detailToggle} onPress={() => setShowDetails(!showDetails)}>
-              <Text style={styles.detailToggleText}>{showDetails ? 'Hide' : 'View'} Details</Text>
+              <Text style={styles.detailToggleText}>{showDetails ? t('hideDetails') : t('viewDetails')}</Text>
               <Ionicons name={showDetails ? 'chevron-up' : 'chevron-down'} size={18} color={colors.primary} />
             </TouchableOpacity>
 
@@ -600,7 +661,7 @@ export default function SensorPlannerScreen({ navigation }: any) {
             {showDetails && (
               <View style={styles.table}>
                 <View style={styles.tableHeadRow}>
-                  {['Sensor', 'Required', 'Installed', 'Status'].map(h => (
+                  {[t('sensor'), t('required'), t('installed'), t('status')].map(h => (
                     <Text key={h} style={styles.tableHead}>{h}</Text>
                   ))}
                 </View>
@@ -636,7 +697,7 @@ export default function SensorPlannerScreen({ navigation }: any) {
           <View style={styles.hintCard}>
             <Ionicons name="arrow-down-circle-outline" size={20} color="#78909C" />
             <Text style={styles.hintText}>
-              Fill in details above and tap “Next” to get AI sensor recommendations
+              {t('fillDetailsHint')}
             </Text>
           </View>
         ) : null}
@@ -768,11 +829,17 @@ const styles = StyleSheet.create({
   },
 
   // Sensor dot (placed on canvas)
-  sensorDot: {
+  sensorDotContainer: {
     position: 'absolute',
-    width: SENSOR_RADIUS * 2,
-    height: SENSOR_RADIUS * 2,
-    borderRadius: SENSOR_RADIUS,
+    width: 44,
+    height: 44,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  sensorDot: {
+    width: 44,
+    height: 44,
+    borderRadius: 22,
     justifyContent: 'center',
     alignItems: 'center',
     elevation: 6,
@@ -798,35 +865,74 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
 
-  // ── Sensor Tray
+  // ── Sensor Tray  (warm, earthy, farmer-friendly)
   tray: {
-    backgroundColor: '#1A237E',
-    paddingVertical: 10,
-    paddingHorizontal: 16,
+    backgroundColor: '#F5F0E8',       // Warm cream — like farm paper, feels natural
+    paddingTop: 10,
+    paddingBottom: 16,
+    paddingHorizontal: 14,
+    borderTopWidth: 3,
+    borderTopColor: '#A5D6A7',         // Soft green top edge — matches header
   },
   trayTitle: {
-    fontSize: 10,
-    color: '#9FA8DA',
+    fontSize: 12,
+    color: '#5D4037',                  // Warm brown — earthy, readable
     textAlign: 'center',
-    letterSpacing: 0.8,
-    textTransform: 'uppercase',
-    marginBottom: 8,
+    marginBottom: 10,
     fontWeight: '600',
+    letterSpacing: 0.2,
+  },
+  trayScroll: {
+    paddingRight: 16,
+    alignItems: 'flex-start',
+  },
+  trayGroup: {
+    alignItems: 'flex-start',
+    marginRight: 4,
+  },
+  trayGroupHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 5,
+    marginBottom: 8,
+    marginLeft: 2,
+  },
+  trayGroupEmoji: {
+    fontSize: 13,
+  },
+  trayGroupTitle: {
+    fontSize: 11,
+    fontWeight: '800',
+    color: '#33691E',                  // Deep earthy green — warm authority
+    textTransform: 'uppercase',
+    letterSpacing: 0.8,
+  },
+  traySeparator: {
+    width: 1.5,
+    marginHorizontal: 14,
+    marginTop: 22,
+    height: 82,
+    backgroundColor: '#BCAAA4',        // Warm taupe — visible and soft
+    alignSelf: 'flex-end',
   },
   trayRow: {
     flexDirection: 'row',
-    gap: 10,
-    justifyContent: 'center',
+    gap: 9,
   },
   trayItem: {
-    flex: 1,
+    width: 86,                         // Slightly larger — easy finger tap
     alignItems: 'center',
-    paddingVertical: 10,
-    paddingHorizontal: 8,
-    borderRadius: 12,
-    borderWidth: 1.5,
-    backgroundColor: 'rgba(255,255,255,0.07)',
+    paddingVertical: 12,
+    paddingHorizontal: 6,
+    borderRadius: 14,
+    borderWidth: 2,
+    backgroundColor: '#FDFAF5',        // Warm off-white — not stark, feels natural
     position: 'relative',
+    elevation: 2,
+    shadowColor: '#5D4037',
+    shadowOpacity: 0.12,
+    shadowRadius: 4,
+    shadowOffset: { width: 0, height: 2 },
   },
   trayIcon: {
     width: 44,
@@ -834,30 +940,36 @@ const styles = StyleSheet.create({
     borderRadius: 22,
     justifyContent: 'center',
     alignItems: 'center',
-    marginBottom: 4,
+    marginBottom: 5,
   },
   trayLabel: {
     fontSize: 11,
-    fontWeight: '700',
+    fontWeight: '800',
+    textAlign: 'center',
+    color: '#3E2723',                  // Rich dark brown — high contrast on warm bg
   },
   trayCost: {
     fontSize: 10,
-    color: '#90A4AE',
-    marginTop: 2,
+    color: '#6D4C41',                  // Medium warm brown — clearly readable
+    marginTop: 3,
+    fontWeight: '700',
+    textAlign: 'center',
   },
   trayBadge: {
     position: 'absolute',
-    top: -5,
-    right: -5,
-    width: 20,
-    height: 20,
-    borderRadius: 10,
+    top: -7,
+    right: -7,
+    width: 22,
+    height: 22,
+    borderRadius: 11,
     justifyContent: 'center',
     alignItems: 'center',
+    borderWidth: 2,
+    borderColor: '#F5F0E8',            // Matches tray bg — clean ring
   },
   trayBadgeText: {
     color: '#FFF',
-    fontSize: 11,
+    fontSize: 10,
     fontWeight: '800',
   },
 

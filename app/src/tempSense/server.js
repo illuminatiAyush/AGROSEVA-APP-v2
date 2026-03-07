@@ -16,7 +16,7 @@ let latest = {
 // 🔌 SERIAL PORT CONFIGURATION
 try {
   const port = new SerialPort({
-    path: 'COM6',
+    path: 'COM8',     // 🔴 change if needed (e.g., /dev/ttyUSB0 on Linux)
     baudRate: 9600
   });
 

@@ -5,13 +5,15 @@ import * as ImagePicker from 'expo-image-picker';
 import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useNavigation } from '@react-navigation/native';
+import { useTranslation } from '@/utils/i18n';
 
 // Using your theme colors (adjust path if needed, e.g., '@/utils/colors' or '@/theme/colors')
-import { colors } from '@/theme/colors'; 
+import { colors } from '@/theme/colors';
 
 const { width } = Dimensions.get('window');
 
 export const CropImageScreen: React.FC = () => {
+  const t = useTranslation();
   const navigation = useNavigation();
   const [image, setImage] = useState<string | null>(null);
   const [analyzing, setAnalyzing] = useState(false);
@@ -61,11 +63,11 @@ export const CropImageScreen: React.FC = () => {
     setTimeout(() => {
       setAnalyzing(false);
       setResult({
-        disease: 'Early Blight',
-        type: 'Fungal Infection',
+        disease: t('diseaseName'),
+        type: t('diseaseType'),
         confidence: 94,
-        cure: 'Spray Mancozeb 75% WP @ 2g/liter water every 10 days.',
-        severity: 'Moderate',
+        cure: t('diseaseCure'),
+        severity: t('severityModerate'),
         color: '#FFA726' // Orange for Moderate
       });
     }, 2500);
@@ -73,17 +75,17 @@ export const CropImageScreen: React.FC = () => {
 
   return (
     <View style={styles.container}>
-      
+
       {/* === HEADER === */}
       <LinearGradient colors={[colors.primary, '#004D40']} style={styles.header}>
         <View style={styles.headerContent}>
           <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backBtn}>
             <Ionicons name="arrow-back" size={24} color="#FFF" />
           </TouchableOpacity>
-          <Text style={styles.headerTitle}>Crop Doctor</Text>
-          <View style={{ width: 40 }} /> 
+          <Text style={styles.headerTitle}>{t('cropDoctorAi')}</Text>
+          <View style={{ width: 40 }} />
         </View>
-        <Text style={styles.headerSubtitle}>AI Disease Detection</Text>
+        <Text style={styles.headerSubtitle}>{t('aiDiseaseDetection')}</Text>
       </LinearGradient>
 
       <ScrollView contentContainerStyle={{ paddingBottom: 100 }}>
@@ -99,17 +101,17 @@ export const CropImageScreen: React.FC = () => {
                   <View style={styles.iconCircle}>
                     <Ionicons name="scan" size={40} color={colors.primary} />
                   </View>
-                  <Text style={styles.placeholderText}>Upload or Take a Photo</Text>
-                  <Text style={styles.placeholderSub}>Ensure leaf is clearly visible</Text>
+                  <Text style={styles.placeholderText}>{t('uploadLeafPhoto')}</Text>
+                  <Text style={styles.placeholderSub}>{t('ensureLeafVisible')}</Text>
                 </View>
               )}
-              
+
               {/* Loading Overlay */}
               {analyzing && (
                 <View style={styles.overlay}>
                   <View style={styles.loadingBox}>
                     <ActivityIndicator size="large" color={colors.primary} />
-                    <Text style={styles.analyzingText}>Analyzing Texture...</Text>
+                    <Text style={styles.analyzingText}>{t('analyzingTexture')}</Text>
                   </View>
                 </View>
               )}
@@ -120,16 +122,16 @@ export const CropImageScreen: React.FC = () => {
           <View style={styles.btnRow}>
             <TouchableOpacity style={styles.galleryBtn} onPress={pickImage} disabled={analyzing}>
               <Ionicons name="images-outline" size={22} color={colors.primary} />
-              <Text style={styles.galleryText}>Gallery</Text>
+              <Text style={styles.galleryText}>{t('gallery')}</Text>
             </TouchableOpacity>
 
             <TouchableOpacity style={styles.cameraBtn} onPress={takePhoto} disabled={analyzing}>
-              <LinearGradient 
-                colors={['#29B6F6', '#0288D1']} 
+              <LinearGradient
+                colors={['#29B6F6', '#0288D1']}
                 style={styles.cameraGradient}
               >
                 <Ionicons name="camera" size={24} color="#FFF" />
-                <Text style={styles.cameraText}>Scan Now</Text>
+                <Text style={styles.cameraText}>{t('scanNow')}</Text>
               </LinearGradient>
             </TouchableOpacity>
           </View>
@@ -137,8 +139,8 @@ export const CropImageScreen: React.FC = () => {
           {/* === RESULT REPORT CARD === */}
           {result && (
             <View style={styles.resultSection}>
-              <Text style={styles.sectionTitle}>Diagnosis Report</Text>
-              
+              <Text style={styles.sectionTitle}>{t('diagnosisReport')}</Text>
+
               <View style={[styles.resultCard, { borderTopColor: result.color }]}>
                 {/* Result Header */}
                 <View style={styles.resultHeader}>
@@ -153,7 +155,7 @@ export const CropImageScreen: React.FC = () => {
 
                 {/* Confidence Bar */}
                 <View style={styles.confidenceContainer}>
-                  <Text style={styles.metaLabel}>AI Confidence</Text>
+                  <Text style={styles.metaLabel}>{t('confidence')}</Text>
                   <Text style={styles.metaValue}>{result.confidence}%</Text>
                 </View>
                 <View style={styles.progressBarBg}>
@@ -166,7 +168,7 @@ export const CropImageScreen: React.FC = () => {
                 <View style={styles.cureSection}>
                   <View style={styles.cureHeader}>
                     <MaterialCommunityIcons name="doctor" size={20} color="#2E7D32" />
-                    <Text style={styles.cureTitle}>Recommended Treatment</Text>
+                    <Text style={styles.cureTitle}>{t('recommendedTreatment')}</Text>
                   </View>
                   <Text style={styles.cureText}>{result.cure}</Text>
                 </View>
@@ -197,7 +199,7 @@ const styles = StyleSheet.create({
   scanCard: { backgroundColor: '#FFF', borderRadius: 20, padding: 10, elevation: 4, shadowColor: '#000', shadowOpacity: 0.1, shadowRadius: 10, marginBottom: 20 },
   imageWrapper: { height: 280, borderRadius: 15, overflow: 'hidden', backgroundColor: '#F5F5F5', justifyContent: 'center', alignItems: 'center', borderStyle: 'dashed', borderWidth: 2, borderColor: '#E0E0E0' },
   image: { width: '100%', height: '100%', resizeMode: 'cover' },
-  
+
   placeholder: { alignItems: 'center', padding: 20 },
   iconCircle: { width: 70, height: 70, borderRadius: 35, backgroundColor: '#E3F2FD', justifyContent: 'center', alignItems: 'center', marginBottom: 15 },
   placeholderText: { color: '#455A64', fontWeight: 'bold', fontSize: 16 },
@@ -211,7 +213,7 @@ const styles = StyleSheet.create({
   btnRow: { flexDirection: 'row', justifyContent: 'space-between', marginBottom: 25 },
   galleryBtn: { flex: 1, flexDirection: 'row', backgroundColor: '#FFF', paddingVertical: 14, borderRadius: 15, alignItems: 'center', justifyContent: 'center', marginRight: 10, elevation: 2, borderWidth: 1, borderColor: '#E0E0E0' },
   galleryText: { color: colors.primary, fontWeight: 'bold', marginLeft: 8 },
-  
+
   cameraBtn: { flex: 1.5, marginLeft: 10 },
   cameraGradient: { flexDirection: 'row', paddingVertical: 14, borderRadius: 15, alignItems: 'center', justifyContent: 'center', elevation: 4 },
   cameraText: { color: '#FFF', fontWeight: 'bold', marginLeft: 8, fontSize: 16 },
@@ -220,7 +222,7 @@ const styles = StyleSheet.create({
   resultSection: { marginTop: 10 },
   sectionTitle: { fontSize: 18, fontWeight: 'bold', color: '#37474F', marginBottom: 15 },
   resultCard: { backgroundColor: '#FFF', borderRadius: 20, padding: 20, elevation: 3, borderTopWidth: 5 },
-  
+
   resultHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 15 },
   diseaseName: { fontSize: 22, fontWeight: 'bold', color: '#333' },
   diseaseType: { fontSize: 14, color: '#78909C' },

@@ -24,7 +24,7 @@ const USE_REAL_HARDWARE = true;
 // IMPORTANT: For mobile app, use your laptop's IP address, not localhost
 // Find your laptop IP: Windows: `ipconfig`, Mac/Linux: `ifconfig`
 // Your detected IP: 172.16.23.32
-const HARDWARE_BRIDGE_URL = 'http://172.16.23.32:3000'; // Hardware-bridge URL (update if IP changes)
+const HARDWARE_BRIDGE_URL = 'http://192.168.0.104:3000'; // Hardware-bridge URL (update if IP changes)
 
 /**
  * Hardware Client Factory

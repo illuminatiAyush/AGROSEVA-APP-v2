@@ -272,13 +272,13 @@ src/
 ## Summary
 
 This implementation provides a complete, hackathon-ready smart farming decision system that:
-- ✅ Uses Gemini AI for crop standards (one-time per crop)
-- ✅ Compares sensor data with standards every 3 seconds
-- ✅ Makes priority-based decisions considering all parameters
-- ✅ Calculates precise irrigation quantities
-- ✅ Provides explainable AI bullet-point explanations
-- ✅ Works offline after initial setup
-- ✅ Easy to extend to real ML and hardware
+-  Uses Gemini AI for crop standards (one-time per crop)
+-  Compares sensor data with standards every 3 seconds
+-  Makes priority-based decisions considering all parameters
+-  Calculates precise irrigation quantities
+-  Provides explainable AI bullet-point explanations
+-  Works offline after initial setup
+-  Easy to extend to real ML and hardware
 
 All code is modular, well-documented, and follows existing project patterns.
 

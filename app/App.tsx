@@ -1,8 +1,9 @@
 // App.tsx
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { StatusBar } from 'expo-status-bar';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import AppNavigator from './src/navigation/AppNavigator';
+import AnimatedSplashScreen from './src/components/AnimatedSplashScreen';
 import { WeatherService } from './src/services/WeatherService';
 import { farmMonitoringService } from './src/services/FarmMonitoringService';
 import { useStore } from './src/store/useStore';
@@ -11,8 +12,9 @@ import { useLanguageStore } from './src/store/useLanguageStore';
 import { useMoistureStore } from './src/store/useMoistureStore';
 
 export default function App() {
-  // Subscribe to language changes to trigger re-renders
   const language = useLanguageStore((state) => state.language);
+  const [isAppReady, setIsAppReady] = useState(false);
+  const [isSplashAnimationComplete, setSplashAnimationComplete] = useState(false);
 
   useEffect(() => {
     // 1. Load language from storage (MUST be first)
@@ -28,12 +30,15 @@ export default function App() {
     // 4. Load Weather Intelligence
     const forecast = WeatherService.getForecast();
     const alert = WeatherService.getAlerts();
-    
+
     // 5. Save to Global Store
     useStore.getState().setWeather({ forecast, alert });
 
     // 6. Start Farm Monitoring Service (compares sensor data with standards every 3 seconds)
     farmMonitoringService.start();
+
+    // App is ready to show
+    setIsAppReady(true);
 
     return () => {
       // Cleanup: Stop moisture polling
@@ -45,6 +50,12 @@ export default function App() {
 
   return (
     <SafeAreaProvider>
+      {(!isAppReady || !isSplashAnimationComplete) && (
+        <AnimatedSplashScreen
+          isReady={isAppReady}
+          onAnimationFinished={() => setSplashAnimationComplete(true)}
+        />
+      )}
       <StatusBar style="dark" />
       <AppNavigator />
     </SafeAreaProvider>

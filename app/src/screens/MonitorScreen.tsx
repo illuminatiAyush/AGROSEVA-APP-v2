@@ -70,29 +70,29 @@ export default function MonitorScreen() {
   const { moisture: liveMoisture, isLoading: moistureLoading, error: moistureError, startPolling, stopPolling } = useMoistureStore();
 
   // 4. Get Sensor Data
-  const { 
-    temperature: sensorTemp, 
+  const {
+    temperature: sensorTemp,
     humidity: sensorHumidity,
     startPolling: startSensorPolling
   } = useSensorStore();
 
   useEffect(() => {
 
-    // Moisture polling
+    // Moisture Polling
     const cleanupMoisture = startPolling();
-    
-    // pH polling
+
+    // pH Polling
     const cleanupPH = startPHPolling();
-    
-    // 🌡️ Temperature + Humidity polling
+
+    // Temperature + Humidity Polling
     const cleanupSensor = startSensorPolling();
-    
+
     return () => {
       cleanupMoisture();
       cleanupPH();
       cleanupSensor();
     };
-  
+
   }, [startPolling, startPHPolling, startSensorPolling]);
 
   // Calculate Advanced Soil Risk
