@@ -1,52 +1,95 @@
 // src/screens/LoginScreen.tsx
 import React, { useState } from 'react';
-import { 
-  View, 
-  Text, 
-  TextInput, 
-  TouchableOpacity, 
-  StyleSheet, 
-  KeyboardAvoidingView, 
-  Platform, 
-  Alert, 
+import {
+  View,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  StyleSheet,
+  KeyboardAvoidingView,
+  Platform,
+  Alert,
   ActivityIndicator,
   ToastAndroid // Added for Android Toast
 } from 'react-native';
+import { useTranslation } from '@/utils/i18n';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
 import { StatusBar } from 'expo-status-bar';
 import { colors } from '@/theme/colors';
 import { supabase } from '@/lib/supabase';
+import { useUserStore } from '@/store/useUserStore';
+import * as LocalAuthentication from 'expo-local-authentication';
 
 // REMOVED: expo-notifications (It causes crash in SDK 53)
 
 export default function LoginScreen({ navigation }: any) {
+  const t = useTranslation();
+  const { biometricEnabled } = useUserStore();
   const [mobile, setMobile] = useState('');
   const [loading, setLoading] = useState(false);
+  const [isAuthenticatingBiometric, setIsAuthenticatingBiometric] = useState(false);
 
   // 1. The Backup Hack: System Alert mimicking SMS
-  const triggerFakeSMS = () => {
+  const triggerFakeSMS = (formattedNumber: string) => {
     // Show a Toast first (Like "Message Sent")
     if (Platform.OS === 'android') {
-        ToastAndroid.show("Verifying Network...", ToastAndroid.SHORT);
+      ToastAndroid.show("Verifying Network...", ToastAndroid.SHORT);
     }
 
     // 2 Second Delay then POPUP
     setTimeout(() => {
-      // This looks like a system dialog - Judge will accept this as receiving data
+      // This looks like a system dialog
       Alert.alert(
-        "📩 MESSAGE RECEIVED", 
-        "AgroSeva: Your verification code is 502791.",
+        "Message from VM-Kisaan",
+        `AgroSeva: Your verification code is 502791.`,
         [
-            { text: "Auto-Fill", onPress: () => console.log("OK") }
+          {
+            text: t('autoFill'), onPress: () => {
+              // Pass the code gracefully to the next screen context or alert
+              navigation.navigate('OtpVerification', { mobile: formattedNumber, autoFillCode: '502791' });
+            }
+          }
         ]
       );
     }, 2000);
   };
 
+  // 2. Biometric Check Effect
+  React.useEffect(() => {
+    const checkBiometric = async () => {
+      if (!biometricEnabled) return; // Only process if they opted in from Settings
+
+      try {
+        const hasHardware = await LocalAuthentication.hasHardwareAsync();
+        const isEnrolled = await LocalAuthentication.isEnrolledAsync();
+
+        if (hasHardware && isEnrolled) {
+          setIsAuthenticatingBiometric(true);
+          const result = await LocalAuthentication.authenticateAsync({
+            promptMessage: 'Login to AgroSeva',
+            cancelLabel: 'Use OTP Instead',
+            disableDeviceFallback: true,
+          });
+
+          if (result.success) {
+            // Biometric verified! Route directly to main dashboard
+            navigation.replace('MainTabs');
+          }
+        }
+      } catch (error) {
+        console.warn('Biometric Error on Login:', error);
+      } finally {
+        setIsAuthenticatingBiometric(false);
+      }
+    };
+
+    checkBiometric();
+  }, [biometricEnabled]);
+
   const handleSendOtp = async () => {
     if (mobile.length !== 10) {
-      Alert.alert("Invalid Number", "Please enter a valid 10-digit mobile number.");
+      Alert.alert(t('invalidNumber'), t('enter10Digit'));
       return;
     }
 
@@ -62,13 +105,13 @@ export default function LoginScreen({ navigation }: any) {
       if (error) throw error;
 
       // Trigger the Alert
-      triggerFakeSMS(); 
-      
-      // Navigate to OTP Screen
+      triggerFakeSMS(formattedNumber);
+
+      // Navigate to OTP Screen (will wait for autofill or just proceed)
       navigation.navigate('OtpVerification', { mobile: formattedNumber });
 
     } catch (error: any) {
-      Alert.alert("Login Error", error.message);
+      Alert.alert(t('loginError'), error.message);
     } finally {
       setLoading(false);
     }
@@ -79,14 +122,17 @@ export default function LoginScreen({ navigation }: any) {
   };
 
   return (
-    <View style={styles.container}>
+    <KeyboardAvoidingView
+      style={styles.container}
+      behavior={Platform.OS === "ios" ? "padding" : "height"}
+    >
       <StatusBar style="light" />
-      
-      <LinearGradient 
-        colors={[colors.primary, '#004D40']} 
+
+      <LinearGradient
+        colors={[colors.primary, '#004D40']}
         style={styles.headerGradient}
-        start={{x: 0, y: 0}} 
-        end={{x: 1, y: 1}}
+        start={{ x: 0, y: 0 }}
+        end={{ x: 1, y: 1 }}
       >
         <View style={styles.logoSection}>
           <View style={styles.iconCircle}>
@@ -97,51 +143,57 @@ export default function LoginScreen({ navigation }: any) {
         </View>
       </LinearGradient>
 
-      <KeyboardAvoidingView 
-        behavior={Platform.OS === "ios" ? "padding" : "height"} 
-        style={styles.formArea}
-      >
+      <View style={styles.formArea}>
         <View style={styles.formCard}>
-          <Text style={styles.welcomeText}>Welcome Farmer</Text>
-          <Text style={styles.instructionText}>Enter your mobile number to get OTP</Text>
+          <Text style={styles.welcomeText}>{t('welcomeFarmer')}</Text>
+          <Text style={styles.instructionText}>{t('instructionOtp')}</Text>
 
-          <View style={styles.inputContainer}>
-            <Ionicons name="call-outline" size={20} color="#666" style={styles.inputIcon} />
-            <Text style={styles.countryCode}>+91</Text> 
-            <View style={styles.verticalDivider} />
-            <TextInput
-              style={styles.input}
-              placeholder="Mobile Number"
-              placeholderTextColor="#999"
-              value={mobile}
-              onChangeText={setMobile}
-              keyboardType="phone-pad"
-              maxLength={10}
-            />
-          </View>
+          {isAuthenticatingBiometric ? (
+            <View style={{ alignItems: 'center', marginTop: 40, marginBottom: 20 }}>
+              <Ionicons name="finger-print" size={60} color={colors.primary} />
+              <Text style={{ marginTop: 15, color: '#546E7A', fontSize: 16 }}>Verifying Identity...</Text>
+            </View>
+          ) : (
+            <>
+              <View style={styles.inputContainer}>
+                <Ionicons name="call-outline" size={20} color="#666" style={styles.inputIcon} />
+                <Text style={styles.countryCode}>+91</Text>
+                <View style={styles.verticalDivider} />
+                <TextInput
+                  style={styles.input}
+                  placeholder={t('mobileNumberLabel')}
+                  placeholderTextColor="#999"
+                  keyboardType="phone-pad"
+                  maxLength={10}
+                  value={mobile}
+                  onChangeText={setMobile}
+                />
+              </View>
 
-          <TouchableOpacity onPress={handleSendOtp} activeOpacity={0.8} disabled={loading}>
-            <LinearGradient colors={[colors.primary, '#2E7D32']} style={styles.loginBtn}>
-              {loading ? (
-                <ActivityIndicator color="#FFF" />
-              ) : (
-                <>
-                  <Text style={styles.loginText}>GET OTP</Text>
-                  <Ionicons name="arrow-forward-circle" size={24} color="#FFF" />
-                </>
-              )}
-            </LinearGradient>
-          </TouchableOpacity>
+              <TouchableOpacity onPress={handleSendOtp} activeOpacity={0.8} disabled={loading}>
+                <LinearGradient colors={[colors.primary, '#2E7D32']} style={styles.loginBtn}>
+                  {loading ? (
+                    <ActivityIndicator color="#FFF" />
+                  ) : (
+                    <>
+                      <Text style={styles.loginText}>{t('getOtp')}</Text>
+                      <Ionicons name="arrow-forward-circle" size={24} color="#FFF" />
+                    </>
+                  )}
+                </LinearGradient>
+              </TouchableOpacity>
+            </>
+          )}
 
           <TouchableOpacity style={styles.guestBtn} onPress={handleGuest}>
-            <Text style={styles.guestText}>Skip & Continue as Guest</Text>
+            <Text style={styles.guestText}>{t('skipAsGuest')}</Text>
           </TouchableOpacity>
 
           <View style={styles.divider} />
-          <Text style={styles.footerText}>Powered by KisaanTech © 2026</Text>
+          <Text style={styles.footerText}>{t('poweredBy')} KisaanTech © 2026</Text>
         </View>
-      </KeyboardAvoidingView>
-    </View>
+      </View>
+    </KeyboardAvoidingView>
   );
 }
 

@@ -4,8 +4,10 @@ import { View, Text, StyleSheet, Image, TouchableOpacity, ActivityIndicator, Ale
 import * as ImagePicker from 'expo-image-picker';
 import { Ionicons } from '@expo/vector-icons';
 import { colors } from '@/theme/colors';
+import { useTranslation } from '@/utils/i18n';
 
 export default function CameraScreen() {
+  const t = useTranslation();
   const [image, setImage] = useState<string | null>(null);
   const [analyzing, setAnalyzing] = useState(false);
   const [result, setResult] = useState<any>(null);
@@ -48,7 +50,7 @@ export default function CameraScreen() {
 
   const analyzeImage = () => {
     setAnalyzing(true);
-    
+
     // FAKE AI DELAY (2 seconds)
     setTimeout(() => {
       setAnalyzing(false);
@@ -64,22 +66,22 @@ export default function CameraScreen() {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Crop Doctor AI</Text>
-      
+      <Text style={styles.title}>{t('cropDoctorAi')}</Text>
+
       <View style={styles.imageContainer}>
         {image ? (
           <Image source={{ uri: image }} style={styles.image} />
         ) : (
           <View style={styles.placeholder}>
             <Ionicons name="scan-outline" size={80} color={colors.textLight} />
-            <Text style={{ color: colors.textLight, marginTop: 10 }}>Upload leaf photo</Text>
+            <Text style={{ color: colors.textLight, marginTop: 10 }}>{t('uploadLeafPhoto')}</Text>
           </View>
         )}
-        
+
         {analyzing && (
           <View style={styles.overlay}>
             <ActivityIndicator size="large" color={colors.accent} />
-            <Text style={styles.analyzingText}>Analyzing Leaf Texture...</Text>
+            <Text style={styles.analyzingText}>{t('syncing')}</Text>
           </View>
         )}
       </View>
@@ -88,12 +90,12 @@ export default function CameraScreen() {
       <View style={styles.btnRow}>
         <TouchableOpacity style={styles.btn} onPress={pickImage}>
           <Ionicons name="images" size={24} color="#FFF" />
-          <Text style={styles.btnText}>Gallery</Text>
+          <Text style={styles.btnText}>{t('gallery')}</Text>
         </TouchableOpacity>
-        
+
         <TouchableOpacity style={[styles.btn, { backgroundColor: colors.accent }]} onPress={takePhoto}>
           <Ionicons name="camera" size={24} color="#000" />
-          <Text style={[styles.btnText, { color: '#000' }]}>Scan Now</Text>
+          <Text style={[styles.btnText, { color: '#000' }]}>{t('scanNow')}</Text>
         </TouchableOpacity>
       </View>
 
@@ -104,12 +106,12 @@ export default function CameraScreen() {
             <Ionicons name="warning" size={30} color={colors.error} />
             <Text style={styles.diseaseName}>{result.disease}</Text>
           </View>
-          
-          <Text style={styles.confidence}>Confidence: {result.confidence}%</Text>
-          
+
+          <Text style={styles.confidence}>{t('confidence')}: {result.confidence}%</Text>
+
           <View style={styles.divider} />
-          
-          <Text style={styles.label}>Recommended Cure:</Text>
+
+          <Text style={styles.label}>{t('recommendedActions')}:</Text>
           <Text style={styles.cure}>{result.cure}</Text>
         </View>
       )}
@@ -125,11 +127,11 @@ const styles = StyleSheet.create({
   placeholder: { alignItems: 'center' },
   overlay: { ...StyleSheet.absoluteFillObject, backgroundColor: 'rgba(0,0,0,0.6)', justifyContent: 'center', alignItems: 'center' },
   analyzingText: { color: '#FFF', marginTop: 10, fontWeight: 'bold' },
-  
+
   btnRow: { flexDirection: 'row', justifyContent: 'space-around', marginBottom: 20 },
   btn: { flexDirection: 'row', backgroundColor: colors.primary, paddingVertical: 12, paddingHorizontal: 25, borderRadius: 30, alignItems: 'center' },
   btnText: { color: '#FFF', fontWeight: 'bold', marginLeft: 10 },
-  
+
   resultCard: { backgroundColor: '#FFF', padding: 20, borderRadius: 15, elevation: 4 },
   resultHeader: { flexDirection: 'row', alignItems: 'center', marginBottom: 5 },
   diseaseName: { fontSize: 20, fontWeight: 'bold', color: colors.error, marginLeft: 10 },

@@ -16,6 +16,7 @@ export const STORAGE_KEYS = {
   CROP_STANDARDS: 'crop_standards',
   FARM_DECISIONS: 'farm_decisions',
   SENSOR_PLANNER: 'sensor_planner',
+  PUMP_SETTINGS: 'pump_settings',
 } as const;
 
 // Zone Configuration

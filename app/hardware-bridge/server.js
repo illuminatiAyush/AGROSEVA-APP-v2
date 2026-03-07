@@ -28,7 +28,7 @@ let lastUpdateTime = null;
 // TODO: Update COM_PORT to match your Arduino's port
 // Windows: COM3, COM4, etc.
 // Mac/Linux: /dev/tty.usbserial-*, /dev/ttyUSB0, etc.
-const COM_PORT = process.env.COM_PORT || 'COM3'; // Default to COM3 on Windows
+const COM_PORT = process.env.COM_PORT || 'COM9'; // Default to COM3 on Windows
 const BAUD_RATE = 9600;
 
 console.log('🔌 Starting Hardware Bridge...');
@@ -125,7 +125,7 @@ app.get('/ph', (req, res) => {
 
   // Return latest reading (matches ESP32 format)
   console.log(`📤 Serving pH request: ${currentData.pH} (age: ${Math.round((Date.now() - lastUpdateTime) / 1000)}s)`);
-  
+
   res.json({
     pH: currentData.pH,
     timestamp: currentData.timestamp,
@@ -148,7 +148,7 @@ app.listen(PORT, () => {
   console.log(`📡 Endpoint: GET http://localhost:${PORT}/ph`);
   console.log(`💚 Health check: GET http://localhost:${PORT}/health`);
   console.log('');
-  
+
   // Initialize serial connection
   initializeSerial();
 });
@@ -161,4 +161,3 @@ process.on('SIGINT', () => {
   }
   process.exit(0);
 });
-

@@ -1,29 +1,40 @@
 // src/screens/OtpScreen.tsx
 import React, { useState, useEffect } from 'react';
-import { 
-  View, 
-  Text, 
-  StyleSheet, 
-  TextInput, 
-  TouchableOpacity, 
-  Alert, 
-  KeyboardAvoidingView, 
-  Platform, 
-  Keyboard, 
-  TouchableWithoutFeedback 
+import {
+  View,
+  Text,
+  StyleSheet,
+  TextInput,
+  TouchableOpacity,
+  Alert,
+  KeyboardAvoidingView,
+  Platform,
+  Keyboard,
+  ActivityIndicator,
+  TouchableWithoutFeedback,
+  ToastAndroid
 } from 'react-native';
+import { useTranslation } from '@/utils/i18n';
 import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 import { colors } from '@/theme/colors';
 import { supabase } from '@/lib/supabase'; // Import Supabase
 
 export default function OtpScreen({ route, navigation }: any) {
+  const t = useTranslation();
   // Get mobile number passed from Login Screen
-  const { mobile } = route.params; 
-  
+  const { mobile } = route.params;
+
   const [code, setCode] = useState('');
   const [timer, setTimer] = useState(30);
   const [loading, setLoading] = useState(false);
+
+  // Initialize with AutoFill if exists from deep link jump/Alert jump
+  useEffect(() => {
+    if (route.params?.autoFillCode) {
+      setCode(route.params.autoFillCode);
+    }
+  }, [route.params?.autoFillCode]);
 
   // Timer Countdown
   useEffect(() => {
@@ -35,7 +46,7 @@ export default function OtpScreen({ route, navigation }: any) {
 
   const handleVerify = async () => {
     if (code.length !== 6) {
-      Alert.alert("Invalid Code", "Please enter the 6-digit OTP.");
+      Alert.alert(t('invalidCode'), t('enter6Digit'));
       return;
     }
 
@@ -53,13 +64,13 @@ export default function OtpScreen({ route, navigation }: any) {
       // 2. Check if we have a session
       if (data.session) {
         // 3. Success! Go to Main App
-        navigation.replace('MainTabs'); 
+        navigation.replace('MainTabs');
       } else {
-        Alert.alert("Error", "Verification failed. Please try again.");
+        Alert.alert(t('errorTitle'), t('verifFailedTryAgain'));
       }
 
     } catch (error: any) {
-      Alert.alert("Verification Failed", error.message);
+      Alert.alert(t('verifFailed'), error.message);
     } finally {
       setLoading(false);
     }
@@ -70,9 +81,9 @@ export default function OtpScreen({ route, navigation }: any) {
     try {
       const { error } = await supabase.auth.signInWithOtp({ phone: mobile });
       if (error) throw error;
-      Alert.alert("Sent", "New code sent.");
+      Alert.alert(t('codeSent'), t('newCodeSent'));
     } catch (error: any) {
-      Alert.alert("Error", error.message);
+      Alert.alert(t('errorTitle'), error.message);
     }
   };
 
@@ -81,13 +92,13 @@ export default function OtpScreen({ route, navigation }: any) {
     const boxes = [];
     for (let i = 0; i < 6; i++) {
       const digit = code[i] || '';
-      const isFocused = i === code.length; 
-      
+      const isFocused = i === code.length;
+
       boxes.push(
         <View key={i} style={[
-          styles.otpBox, 
-          isFocused && styles.otpBoxActive, 
-          digit !== '' && styles.otpBoxFilled 
+          styles.otpBox,
+          isFocused && styles.otpBoxActive,
+          digit !== '' && styles.otpBoxFilled
         ]}>
           <Text style={styles.otpText}>{digit}</Text>
         </View>
@@ -99,65 +110,65 @@ export default function OtpScreen({ route, navigation }: any) {
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
       <View style={styles.container}>
-        
+
         {/* Simple Top Bar */}
         <View style={styles.header}>
-            <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backBtn}>
-                <Ionicons name="arrow-back" size={24} color="#333" />
-            </TouchableOpacity>
+          <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backBtn}>
+            <Ionicons name="arrow-back" size={24} color="#333" />
+          </TouchableOpacity>
         </View>
 
         <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : "height"} style={styles.content}>
-            
-            {/* Title Section */}
-            <View style={styles.titleSection}>
-                <Text style={styles.title}>Verification Code</Text>
-                <Text style={styles.subtitle}>
-                    Enter the code sent to{'\n'}
-                    <Text style={styles.bold}>{mobile}</Text>
-                </Text>
-            </View>
 
-            {/* OTP Boxes Display */}
-            <View style={styles.otpContainer}>
-                {renderBoxes()}
-            </View>
+          {/* Title Section */}
+          <View style={styles.titleSection}>
+            <Text style={styles.title}>{t('verificationCode')}</Text>
+            <Text style={styles.subtitle}>
+              {t('enterCodeSentTo')}{'\n'}
+              <Text style={styles.bold}>{mobile}</Text>
+            </Text>
+          </View>
 
-            {/* Hidden Input for typing */}
-            <TextInput
-                style={styles.hiddenInput}
-                keyboardType="number-pad"
-                maxLength={6}
-                value={code}
-                onChangeText={setCode}
-                autoFocus
-                caretHidden={true}
-            />
+          {/* OTP Boxes Display */}
+          <View style={styles.otpContainer}>
+            {renderBoxes()}
+          </View>
 
-            {/* Verify Button */}
-            <TouchableOpacity style={styles.buttonWrapper} onPress={handleVerify} disabled={loading}>
-                <LinearGradient 
-                    colors={code.length === 6 ? [colors.primary, '#2E7D32'] : ['#BDBDBD', '#9E9E9E']} 
-                    style={styles.button}
-                >
-                    <Text style={styles.buttonText}>
-                      {loading ? "VERIFYING..." : "VERIFY"}
-                    </Text>
-                </LinearGradient>
-            </TouchableOpacity>
+          {/* Hidden Input for typing */}
+          <TextInput
+            style={styles.hiddenInput}
+            keyboardType="number-pad"
+            maxLength={6}
+            value={code}
+            onChangeText={setCode}
+            autoFocus
+            caretHidden={true}
+          />
 
-            {/* Resend Timer */}
-            <View style={styles.resendWrapper}>
-                {timer > 0 ? (
-                    <Text style={styles.timerText}>
-                        Resend code in <Text style={styles.bold}>00:{timer < 10 ? `0${timer}` : timer}</Text>
-                    </Text>
-                ) : (
-                    <TouchableOpacity onPress={handleResend}>
-                        <Text style={styles.resendLink}>Resend Code</Text>
-                    </TouchableOpacity>
-                )}
-            </View>
+          {/* Verify Button */}
+          <TouchableOpacity style={styles.buttonWrapper} onPress={handleVerify} disabled={loading}>
+            <LinearGradient
+              colors={code.length === 6 ? [colors.primary, '#2E7D32'] : ['#BDBDBD', '#9E9E9E']}
+              style={styles.button}
+            >
+              <Text style={styles.buttonText}>
+                {loading ? t('verifying') : t('verify')}
+              </Text>
+            </LinearGradient>
+          </TouchableOpacity>
+
+          {/* Resend Timer */}
+          <View style={styles.resendWrapper}>
+            {timer > 0 ? (
+              <Text style={styles.timerText}>
+                {t('resendCodeIn')} <Text style={styles.bold}>00:{timer < 10 ? `0${timer}` : timer}</Text>
+              </Text>
+            ) : (
+              <TouchableOpacity onPress={handleResend}>
+                <Text style={styles.resendLink}>{t('resendCode')}</Text>
+              </TouchableOpacity>
+            )}
+          </View>
 
         </KeyboardAvoidingView>
       </View>
@@ -177,27 +188,27 @@ const styles = StyleSheet.create({
 
   // OTP Box Styles
   otpContainer: { flexDirection: 'row', justifyContent: 'space-between', marginBottom: 40 },
-  otpBox: { 
-    width: 45, 
-    height: 55, 
-    borderRadius: 10, 
-    borderWidth: 1.5, 
-    borderColor: '#EEEEEE', 
+  otpBox: {
+    width: 45,
+    height: 55,
+    borderRadius: 10,
+    borderWidth: 1.5,
+    borderColor: '#EEEEEE',
     backgroundColor: '#FAFAFA',
-    justifyContent: 'center', 
-    alignItems: 'center' 
+    justifyContent: 'center',
+    alignItems: 'center'
   },
   otpBoxActive: { borderColor: colors.primary, backgroundColor: '#FFF', elevation: 2 },
   otpBoxFilled: { backgroundColor: '#FFF', borderColor: '#333' },
   otpText: { fontSize: 24, fontWeight: 'bold', color: '#333' },
 
   // Hidden Input overlaps the boxes invisibly so keyboard works
-  hiddenInput: { 
-    position: 'absolute', 
-    width: '100%', 
-    height: 100, 
+  hiddenInput: {
+    position: 'absolute',
+    width: '100%',
+    height: 100,
     top: 150, // positions it over the boxes area
-    opacity: 0 
+    opacity: 0
   },
 
   buttonWrapper: { marginTop: 10 },

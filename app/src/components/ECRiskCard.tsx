@@ -63,7 +63,7 @@ export const ECRiskCard: React.FC<ECRiskCardProps> = ({
   };
 
   // Get gradient colors based on risk level
-  const getGradientColors = (level: string): string[] => {
+  const getGradientColors = (level: string): readonly [string, string] => {
     switch (level) {
       case 'Low':
         return ['#4CAF50', '#388E3C'];
@@ -79,7 +79,7 @@ export const ECRiskCard: React.FC<ECRiskCardProps> = ({
   };
 
   // Get icon based on risk level
-  const getRiskIcon = (level: string): string => {
+  const getRiskIcon = (level: string): any => {
     switch (level) {
       case 'Low':
         return 'checkmark-circle';
@@ -171,7 +171,7 @@ export const ECRiskCard: React.FC<ECRiskCardProps> = ({
           {/* EC Risk Breakdown */}
           <View style={styles.breakdownSection}>
             <Text style={styles.sectionTitle}>{t('ecRiskBreakdown')}</Text>
-            
+
             <View style={styles.breakdownItem}>
               <View style={styles.breakdownLabel}>
                 <Ionicons name="flask" size={16} color="#8E24AA" />
@@ -297,9 +297,9 @@ export const ECRiskCard: React.FC<ECRiskCardProps> = ({
             activeOpacity={0.7}
           >
             <Text style={styles.temperatureToggleText}>
-              {isTemperatureExpanded 
+              {isTemperatureExpanded
                 ? t('hideDetails')
-                : 'Why temperature matters?'}
+                : t('whyThisRisk')}
             </Text>
             <Ionicons
               name={isTemperatureExpanded ? 'chevron-up' : 'chevron-down'}

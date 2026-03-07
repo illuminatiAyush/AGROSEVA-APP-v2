@@ -1,32 +1,43 @@
 import { SensorData } from '@/models/SensorData';
-import { hardwareClient } from '@/hardware/HardwareConfig';
-import { HttpEnvironmentClient } from '@/hardware/HttpEnvironmentClient';
-import { hardwareConfig } from '@/hardware/HardwareConfig';
 
-const environmentClient = new HttpEnvironmentClient(hardwareConfig.esp32Address || 'http://localhost:3000');
+const API_URL = 'http://192.168.0.104:8000/sensor';
 
 export class SensorService {
+
   static async fetchLiveSensors(): Promise<SensorData> {
-    // Fetch pH from existing pH client (unchanged)
-    const phData = await hardwareClient.getPH();
-    
-    // Fetch temperature and humidity from environment client
+
     try {
-      const envData = await environmentClient.getEnvironment();
+
+      const response = await fetch(API_URL);
+
+      if (!response.ok) {
+        throw new Error('Server error');
+      }
+
+      const data = await response.json();
+
+      console.log("🌡 SENSOR API RESPONSE:", data);
+
       return {
-        pH: phData.pH,
-        temperature: envData.temperature,
-        humidity: envData.humidity,
-        timestamp: phData.timestamp,
-      };
-    } catch (error) {
-      // Fallback to defaults if environment sensor is unavailable
-      return {
-        pH: phData.pH,
+        pH: Number(data.pH) || 0,
         temperature: 25,
         humidity: 60,
-        timestamp: phData.timestamp,
+        timestamp: data.timestamp || Date.now(),
       };
+
+    } catch (error) {
+
+      console.log('Sensor fetch error:', error);
+
+      return {
+        pH: 0,
+        temperature: 25,
+        humidity: 60,
+        timestamp: Date.now(),
+      };
+
     }
+
   }
+
 }

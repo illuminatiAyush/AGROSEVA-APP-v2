@@ -55,7 +55,7 @@ plugins: [
 
 ## Usage
 
-### ✅ Correct (Absolute Imports)
+###  Correct (Absolute Imports)
 
 ```typescript
 import { Colors } from '@/utils/colors';
@@ -101,11 +101,11 @@ For proper IDE autocomplete:
 ### "Unable to resolve @/..."
 
 **Checklist:**
-1. ✅ `tsconfig.json` has `baseUrl: "."` and `paths: { "@/*": ["src/*"] }`
-2. ✅ `babel.config.js` has `module-resolver` plugin configured
-3. ✅ `babel-plugin-module-resolver` is installed in `devDependencies`
-4. ✅ Restarted Expo dev server with `-c` flag
-5. ✅ Restarted TypeScript server in IDE
+1.  `tsconfig.json` has `baseUrl: "."` and `paths: { "@/*": ["src/*"] }`
+2.  `babel.config.js` has `module-resolver` plugin configured
+3.  `babel-plugin-module-resolver` is installed in `devDependencies`
+4.  Restarted Expo dev server with `-c` flag
+5.  Restarted TypeScript server in IDE
 
 ### TypeScript errors but app runs
 

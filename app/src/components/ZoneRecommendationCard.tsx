@@ -8,6 +8,7 @@ import { FarmDecision, ZoneSetup, CropStandards } from '@/models/FarmSetup';
 import { SoilData } from '@/models/SoilData';
 import { WeatherData } from '@/models/WeatherData';
 import { colors } from '@/theme/colors';
+import { useTranslation } from '@/utils/i18n';
 
 interface ZoneRecommendationCardProps {
   zone: ZoneSetup;
@@ -22,6 +23,7 @@ export const ZoneRecommendationCard: React.FC<ZoneRecommendationCardProps> = ({
   soilData,
   weatherData,
 }) => {
+  const t = useTranslation();
   const [isExpanded, setIsExpanded] = useState(false);
   const cropStandards = zone.cropStandards;
 
@@ -53,27 +55,25 @@ export const ZoneRecommendationCard: React.FC<ZoneRecommendationCardProps> = ({
     }
   };
 
-  // Get action text in simple language
   const getActionText = (action: FarmDecision['action']): string => {
     switch (action) {
       case 'IRRIGATE':
-        return 'Water Needed';
+        return t('waterNeeded');
       case 'FERTILIZE':
-        return 'Fertilizer Needed';
+        return t('fertilizerNeeded');
       case 'SOIL_CORRECTION':
-        return 'Soil Treatment Needed';
+        return t('soilTreatmentNeeded');
       case 'WAIT':
-        return 'No Action Needed';
+        return t('noActionNeeded');
       default:
         return action;
     }
   };
 
-  // Get confidence level in simple terms
   const getConfidenceLevel = (confidence: number): { text: string; color: string } => {
-    if (confidence >= 85) return { text: 'High', color: colors.success };
-    if (confidence >= 70) return { text: 'Medium', color: colors.accent };
-    return { text: 'Low', color: colors.error };
+    if (confidence >= 85) return { text: t('high'), color: colors.success };
+    if (confidence >= 70) return { text: t('medium'), color: colors.accent };
+    return { text: t('low'), color: colors.error };
   };
 
   // Format water quantity in farmer-friendly terms
@@ -82,7 +82,7 @@ export const ZoneRecommendationCard: React.FC<ZoneRecommendationCardProps> = ({
       const lakhs = (liters / 100000).toFixed(2);
       // Remove trailing zeros
       const cleanLakhs = parseFloat(lakhs).toString();
-      return `${cleanLakhs} lakh liters`;
+      return `${cleanLakhs} ${t('lakhLiters')}`;
     }
     if (liters >= 1000) {
       const thousands = (liters / 1000).toFixed(1);
@@ -92,28 +92,25 @@ export const ZoneRecommendationCard: React.FC<ZoneRecommendationCardProps> = ({
     return `${Math.round(liters)} liters`;
   };
 
-  // Get moisture status in simple words
   const getMoistureStatus = (value: number, min: number, max: number): string => {
-    if (value < min * 0.7) return 'Very low';
-    if (value < min) return 'Low';
-    if (value > max) return 'High';
-    return 'Normal';
+    if (value < min * 0.7) return t('veryLow');
+    if (value < min) return t('lowMoisture');
+    if (value > max) return t('highMoisture');
+    return t('normal');
   };
 
-  // Get pH status in simple words
   const getPHStatus = (value: number, min: number, max: number): string => {
-    if (value < min) return 'Too acidic';
-    if (value > max) return 'Too alkaline';
-    if (value < min + 0.3) return 'Slightly acidic';
-    if (value > max - 0.3) return 'Slightly high';
-    return 'Normal';
+    if (value < min) return t('tooAcidic');
+    if (value > max) return t('tooAlkaline');
+    if (value < min + 0.3) return t('slightlyAcidic');
+    if (value > max - 0.3) return t('slightlyHigh');
+    return t('normal');
   };
 
-  // Get temperature status
   const getTempStatus = (value: number, min: number, max: number): string => {
-    if (value < min) return 'Too cold';
-    if (value > max) return 'Too hot';
-    return 'Normal';
+    if (value < min) return t('tooCold');
+    if (value > max) return t('tooHot');
+    return t('normal');
   };
 
   // Extract main problem from explanation
@@ -129,9 +126,9 @@ export const ZoneRecommendationCard: React.FC<ZoneRecommendationCardProps> = ({
       return 'Soil pH is not suitable for this crop';
     }
     if (explanation.includes('optimal')) {
-      return 'All conditions are good';
+      return t('allConditionsGood');
     }
-    return 'Monitor field conditions';
+    return t('monitorFieldConditions');
   };
 
   const actionColor = getActionColor(decision.action);
@@ -155,9 +152,9 @@ export const ZoneRecommendationCard: React.FC<ZoneRecommendationCardProps> = ({
           <MaterialCommunityIcons
             name={
               decision.action === 'IRRIGATE' ? 'water-pump' :
-              decision.action === 'FERTILIZE' ? 'fertilizer' :
-              decision.action === 'SOIL_CORRECTION' ? 'flask-outline' :
-              'check-circle'
+                decision.action === 'FERTILIZE' ? 'leaf' :
+                  decision.action === 'SOIL_CORRECTION' ? 'flask-outline' :
+                    'check-circle'
             }
             size={20}
             color={actionColor}
@@ -171,7 +168,7 @@ export const ZoneRecommendationCard: React.FC<ZoneRecommendationCardProps> = ({
         {decision.irrigationQuantity && (
           <View style={styles.quantityRow}>
             <Ionicons name="water" size={18} color={colors.water} />
-            <Text style={styles.quantityLabel}>Water Needed: </Text>
+            <Text style={styles.quantityLabel}>{t('waterNeededLabel')}: </Text>
             <Text style={styles.quantityValue}>
               {decision.irrigationQuantity.mm.toFixed(0)} mm
             </Text>
@@ -180,7 +177,7 @@ export const ZoneRecommendationCard: React.FC<ZoneRecommendationCardProps> = ({
         {decision.irrigationQuantity && (
           <View style={styles.quantityRow}>
             <Ionicons name="water-outline" size={18} color={colors.water} />
-            <Text style={styles.quantityLabel}>Total Water: </Text>
+            <Text style={styles.quantityLabel}>{t('totalWaterLabel')}: </Text>
             <Text style={styles.quantityValue}>
               {formatWaterQuantity(decision.irrigationQuantity.totalLiters)}
             </Text>
@@ -188,8 +185,8 @@ export const ZoneRecommendationCard: React.FC<ZoneRecommendationCardProps> = ({
         )}
         {decision.fertilizerQuantity && (
           <View style={styles.quantityRow}>
-            <MaterialCommunityIcons name="fertilizer" size={18} color={colors.accent} />
-            <Text style={styles.quantityLabel}>Fertilizer: </Text>
+            <MaterialCommunityIcons name="leaf" size={18} color={colors.accent} />
+            <Text style={styles.quantityLabel}>{t('fertilizerNeeded')}: </Text>
             <Text style={styles.quantityValue}>
               {decision.fertilizerQuantity.amount} kg/acre ({decision.fertilizerQuantity.type})
             </Text>
@@ -198,7 +195,7 @@ export const ZoneRecommendationCard: React.FC<ZoneRecommendationCardProps> = ({
 
         {/* Confidence Level */}
         <View style={styles.confidenceRow}>
-          <Text style={styles.confidenceLabel}>Confidence: </Text>
+          <Text style={styles.confidenceLabel}>{t('confidence')}: </Text>
           <View style={[styles.confidenceBadge, { backgroundColor: confidence.color + '20' }]}>
             <Text style={[styles.confidenceText, { color: confidence.color }]}>
               {confidence.text}
@@ -213,7 +210,7 @@ export const ZoneRecommendationCard: React.FC<ZoneRecommendationCardProps> = ({
         onPress={() => setIsExpanded(!isExpanded)}
         activeOpacity={0.7}
       >
-        <Text style={styles.toggleText}>Why this action?</Text>
+        <Text style={styles.toggleText}>{t('whyThisAction')}</Text>
         <Ionicons
           name={isExpanded ? 'chevron-up' : 'chevron-down'}
           size={20}
@@ -226,9 +223,9 @@ export const ZoneRecommendationCard: React.FC<ZoneRecommendationCardProps> = ({
         <View style={styles.expandedContent}>
           {/* A. Crop Requirement */}
           <View style={styles.detailSection}>
-            <Text style={styles.detailSectionTitle}>Crop Requirement (Reference)</Text>
+            <Text style={styles.detailSectionTitle}>{t('cropRequirement')}</Text>
             <Text style={styles.detailSectionSubtitle}>
-              Your {zone.cropName} grows best when:
+              {t('yourCropGrows').replace('{crop}', zone.cropName)}
             </Text>
             <View style={styles.requirementList}>
               <Text style={styles.requirementItem}>
@@ -245,7 +242,7 @@ export const ZoneRecommendationCard: React.FC<ZoneRecommendationCardProps> = ({
 
           {/* B. Current Field Condition */}
           <View style={styles.detailSection}>
-            <Text style={styles.detailSectionTitle}>Current Field Condition</Text>
+            <Text style={styles.detailSectionTitle}>{t('currentFieldCondition')}</Text>
             <View style={styles.conditionList}>
               <Text style={styles.conditionItem}>
                 • Soil moisture: {getMoistureStatus(soilData.moisture.value, cropStandards.optimalMoistureMin, cropStandards.optimalMoistureMax)} ({soilData.moisture.value.toFixed(1)}%)
@@ -261,7 +258,7 @@ export const ZoneRecommendationCard: React.FC<ZoneRecommendationCardProps> = ({
 
           {/* C. Problem Detected */}
           <View style={styles.detailSection}>
-            <Text style={styles.detailSectionTitle}>Problem Detected</Text>
+            <Text style={styles.detailSectionTitle}>{t('problemDetected')}</Text>
             <View style={[styles.problemBox, { backgroundColor: actionColor === colors.error ? '#FFEBEE' : '#FFF3E0' }]}>
               <Text style={styles.problemText}>
                 {getMainProblem()}
@@ -271,24 +268,24 @@ export const ZoneRecommendationCard: React.FC<ZoneRecommendationCardProps> = ({
 
           {/* D. Decision Reason */}
           <View style={styles.detailSection}>
-            <Text style={styles.detailSectionTitle}>Decision Reason</Text>
+            <Text style={styles.detailSectionTitle}>{t('decisionReason')}</Text>
             <Text style={styles.reasonText}>
               {decision.explanation
                 .find(e => e.toLowerCase().includes('reason:'))
                 ?.replace(/reason:\s*/i, '') ||
-               decision.explanation
-                .find(e => e.toLowerCase().includes('reason'))
-                ?.replace(/reason\s*/i, '') ||
-               decision.explanation
-                .find(e => e.length > 50 && !e.includes(':')) ||
-               'Based on current field conditions and crop requirements.'}
+                decision.explanation
+                  .find(e => e.toLowerCase().includes('reason'))
+                  ?.replace(/reason\s*/i, '') ||
+                decision.explanation
+                  .find(e => e.length > 50 && !e.includes(':')) ||
+                t('basedOnConditions')}
             </Text>
           </View>
 
           {/* E. Water Calculation (if irrigation) */}
           {decision.action === 'IRRIGATE' && decision.irrigationQuantity && cropStandards && (
             <View style={styles.detailSection}>
-              <Text style={styles.detailSectionTitle}>Water Calculation</Text>
+              <Text style={styles.detailSectionTitle}>{t('waterCalculation')}</Text>
               <View style={styles.calculationList}>
                 <Text style={styles.calculationItem}>
                   • Crop has {cropStandards.rootDepth}cm deep roots (needs more water to reach all roots)
@@ -306,11 +303,11 @@ export const ZoneRecommendationCard: React.FC<ZoneRecommendationCardProps> = ({
                 )}
               </View>
               <View style={styles.finalResultBox}>
-                <Text style={styles.finalResultLabel}>Final water required:</Text>
+                <Text style={styles.finalResultLabel}>{t('finalWaterRequired')}:</Text>
                 <Text style={styles.finalResultValue}>
                   {decision.irrigationQuantity.mm.toFixed(0)} mm
                 </Text>
-                <Text style={styles.finalResultLabel}>Total for this zone:</Text>
+                <Text style={styles.finalResultLabel}>{t('totalForZone')}:</Text>
                 <Text style={styles.finalResultValue}>
                   {formatWaterQuantity(decision.irrigationQuantity.totalLiters)}
                 </Text>
@@ -322,7 +319,7 @@ export const ZoneRecommendationCard: React.FC<ZoneRecommendationCardProps> = ({
           <View style={styles.trustBox}>
             <Ionicons name="information-circle-outline" size={20} color={colors.textLight} />
             <Text style={styles.trustText}>
-              This is a recommendation. The farmer can decide when and how to act.
+              {t('trustMessage')}
             </Text>
           </View>
         </View>

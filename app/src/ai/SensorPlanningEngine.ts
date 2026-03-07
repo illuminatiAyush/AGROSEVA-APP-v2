@@ -4,9 +4,11 @@
  * No UI logic - only business rules and calculations.
  */
 
+import { t } from '@/utils/i18n';
+
 export type CropType = 'Rice' | 'Wheat' | 'Vegetables';
 
-export type SensorType = 'Soil' | 'pH' | 'NPK';
+export type SensorType = 'Soil' | 'pH' | 'NPK' | 'Moisture' | 'Temperature' | 'Arduino' | 'ESP32';
 
 export interface SensorRequirement {
   type: SensorType;
@@ -18,13 +20,13 @@ export interface SensorStatus {
   type: SensorType;
   required: number;
   installed: number;
-  status: 'NEEDS MORE' | 'OPTIMAL' | 'EXTRA';
+  status: string; // Localized status
 }
 
 export interface ZoneVerdict {
-  overall: 'OPTIMAL' | 'NEEDS MORE' | 'OVER-PLANNED';
+  overall: string; // Localized overall status
   accuracy: number; // 0-95%
-  accuracyLabel: 'Low' | 'Medium' | 'High';
+  accuracyLabel: string; // Localized label
   totalCost: number;
   sensorStatuses: SensorStatus[];
 }
@@ -33,6 +35,10 @@ export interface SensorCosts {
   Soil: number;
   pH: number;
   NPK: number;
+  Moisture: number;
+  Temperature: number;
+  Arduino: number;
+  ESP32: number;
 }
 
 // Fixed sensor costs (in ₹)
@@ -40,6 +46,10 @@ export const SENSOR_COSTS: SensorCosts = {
   Soil: 2000,
   pH: 1500,
   NPK: 3000,
+  Moisture: 1800, // Soil moisture probe
+  Temperature: 1200, // Ambient/soil temperature probe
+  Arduino: 1200,  // Microcontroller
+  ESP32: 800,     // WiFi Microcontroller
 };
 
 /**
@@ -54,57 +64,42 @@ export function calculateRequiredSensors(
 
   switch (cropType) {
     case 'Wheat':
-      requirements.push({
-        type: 'Soil',
-        required: Math.ceil(2 * areaInAcres), // 2 sensors per acre (REQUIRED)
-        isRequired: true,
-      });
-      requirements.push({
-        type: 'pH',
-        required: 1, // 1 per zone (REQUIRED)
-        isRequired: true,
-      });
-      requirements.push({
-        type: 'NPK',
-        required: 0, // Optional
-        isRequired: false,
-      });
+      // Soil: 2 per acre — monitors root-zone moisture retention
+      requirements.push({ type: 'Soil', required: Math.ceil(2 * areaInAcres), isRequired: true });
+      // pH: 1 per zone — wheat is pH-sensitive (6.0–7.5 ideal)
+      requirements.push({ type: 'pH', required: 1, isRequired: true });
+      // NPK: optional for wheat (rain-fed)
+      requirements.push({ type: 'NPK', required: 0, isRequired: false });
+      // Moisture: 1 per acre — dry spells hurt wheat yield significantly
+      requirements.push({ type: 'Moisture', required: Math.ceil(1 * areaInAcres), isRequired: true });
+      // Temperature: 1 per zone — frost & heat stress detection
+      requirements.push({ type: 'Temperature', required: 1, isRequired: true });
       break;
 
     case 'Rice':
-      requirements.push({
-        type: 'Soil',
-        required: Math.ceil(3 * areaInAcres), // 3 sensors per acre (REQUIRED)
-        isRequired: true,
-      });
-      requirements.push({
-        type: 'pH',
-        required: 1, // 1 per zone (REQUIRED)
-        isRequired: true,
-      });
-      requirements.push({
-        type: 'NPK',
-        required: 1, // 1 per zone (REQUIRED)
-        isRequired: true,
-      });
+      // Soil: 3 per acre — paddy fields need dense soil monitoring
+      requirements.push({ type: 'Soil', required: Math.ceil(3 * areaInAcres), isRequired: true });
+      // pH: 1 per zone — rice grows best at pH 5.5–6.5
+      requirements.push({ type: 'pH', required: 1, isRequired: true });
+      // NPK: 1 per zone — nitrogen-heavy crop
+      requirements.push({ type: 'NPK', required: 1, isRequired: true });
+      // Moisture: 2 per acre — rice is water-intensive; critical sensor
+      requirements.push({ type: 'Moisture', required: Math.ceil(2 * areaInAcres), isRequired: true });
+      // Temperature: 1 per zone — cold nights reduce germination rate
+      requirements.push({ type: 'Temperature', required: 1, isRequired: true });
       break;
 
     case 'Vegetables':
-      requirements.push({
-        type: 'Soil',
-        required: Math.ceil(3 * areaInAcres), // 3 sensors per acre (REQUIRED)
-        isRequired: true,
-      });
-      requirements.push({
-        type: 'pH',
-        required: 1, // 1 per zone (REQUIRED)
-        isRequired: true,
-      });
-      requirements.push({
-        type: 'NPK',
-        required: Math.ceil(0.5 * areaInAcres), // 0.5 per acre (REQUIRED)
-        isRequired: true,
-      });
+      // Soil: 3 per acre — frequent tilling needs continuous monitoring
+      requirements.push({ type: 'Soil', required: Math.ceil(3 * areaInAcres), isRequired: true });
+      // pH: 1 per zone — most vegetables prefer pH 6.0–7.0
+      requirements.push({ type: 'pH', required: 1, isRequired: true });
+      // NPK: 0.5 per acre — fertiliser-heavy crops
+      requirements.push({ type: 'NPK', required: Math.ceil(0.5 * areaInAcres), isRequired: true });
+      // Moisture: 1 per acre — consistent watering needed for yield
+      requirements.push({ type: 'Moisture', required: Math.ceil(1 * areaInAcres), isRequired: true });
+      // Temperature: 1 per zone — cold/heat stress shows quickly in vegetables
+      requirements.push({ type: 'Temperature', required: 1, isRequired: true });
       break;
   }
 
@@ -117,10 +112,10 @@ export function calculateRequiredSensors(
 export function calculateSensorStatus(
   required: number,
   installed: number
-): 'NEEDS MORE' | 'OPTIMAL' | 'EXTRA' {
-  if (installed < required) return 'NEEDS MORE';
-  if (installed === required) return 'OPTIMAL';
-  return 'EXTRA';
+): string {
+  if (installed < required) return t('needsMore');
+  if (installed === required) return t('optimalStatus');
+  return t('extra');
 }
 
 /**
@@ -128,13 +123,13 @@ export function calculateSensorStatus(
  */
 export function calculateZoneVerdict(
   sensorStatuses: SensorStatus[]
-): 'OPTIMAL' | 'NEEDS MORE' | 'OVER-PLANNED' {
-  const hasNeedsMore = sensorStatuses.some(s => s.status === 'NEEDS MORE');
-  const hasExtra = sensorStatuses.some(s => s.status === 'EXTRA');
+): string {
+  const hasNeedsMore = sensorStatuses.some(s => s.status === t('needsMore'));
+  const hasExtra = sensorStatuses.some(s => s.status === t('extra'));
 
-  if (hasNeedsMore) return 'NEEDS MORE';
-  if (hasExtra) return 'OVER-PLANNED';
-  return 'OPTIMAL';
+  if (hasNeedsMore) return t('needsMore');
+  if (hasExtra) return t('overPlanned');
+  return t('optimalStatus');
 }
 
 /**
@@ -150,7 +145,7 @@ export function calculateAccuracy(
   // Calculate accuracy contribution from each sensor type
   sensorStatuses.forEach(status => {
     const { type, required, installed } = status;
-    
+
     if (required === 0) return; // Skip optional sensors for accuracy
 
     // Calculate coverage ratio (how many required sensors are installed)
@@ -160,13 +155,19 @@ export function calculateAccuracy(
     let contribution = 0;
     switch (type) {
       case 'Soil':
-        contribution = coverage * 25; // Soil sensors are most important
+        contribution = coverage * 20; // Root-zone health — high importance
         break;
       case 'pH':
-        contribution = coverage * 15; // pH is important
+        contribution = coverage * 12; // pH balance — important
         break;
       case 'NPK':
-        contribution = coverage * 10; // NPK adds precision
+        contribution = coverage * 8;  // Nutrient levels — adds precision
+        break;
+      case 'Moisture':
+        contribution = coverage * 10; // Water stress prevention — significant
+        break;
+      case 'Temperature':
+        contribution = coverage * 5;  // Climate advisory — supplementary
         break;
     }
 
@@ -178,17 +179,17 @@ export function calculateAccuracy(
     baseAccuracy += contribution;
   });
 
-  // Cap at 95%
+  // Cap at 95% — no sensor network can achieve perfect certainty
   return Math.min(Math.round(baseAccuracy), 95);
 }
 
 /**
  * Get accuracy label from percentage
  */
-export function getAccuracyLabel(accuracy: number): 'Low' | 'Medium' | 'High' {
-  if (accuracy < 70) return 'Low';
-  if (accuracy < 85) return 'Medium';
-  return 'High';
+export function getAccuracyLabel(accuracy: number): string {
+  if (accuracy < 70) return t('low');
+  if (accuracy < 85) return t('medium');
+  return t('high');
 }
 
 /**

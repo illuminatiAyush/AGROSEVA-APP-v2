@@ -7,13 +7,17 @@
     "start": "node server.js"
   },
   "dependencies": {
-    "serialport": "^12.0.0",
     "@serialport/parser-readline": "^12.0.0",
-    "express": "^4.18.2",
-    "cors": "^2.8.5"
+    "cors": "^2.8.6",
+    "express": "^4.22.1",
+    "serialport": "^12.0.0"
   },
-  "keywords": ["arduino", "serial", "bridge", "ph-sensor"],
+  "keywords": [
+    "arduino",
+    "serial",
+    "bridge",
+    "ph-sensor"
+  ],
   "author": "",
   "license": "MIT"
 }
-
