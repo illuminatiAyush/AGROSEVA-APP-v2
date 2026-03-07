@@ -10,6 +10,8 @@ import { useStore } from './src/store/useStore';
 import { useFarmSetupStore } from './src/store/useFarmSetupStore';
 import { useLanguageStore } from './src/store/useLanguageStore';
 import { useMoistureStore } from './src/store/useMoistureStore';
+import { sensorAlertService } from './src/services/sensorAlertService';
+import * as Notifications from 'expo-notifications';
 
 export default function App() {
   const language = useLanguageStore((state) => state.language);
@@ -37,6 +39,17 @@ export default function App() {
     // 6. Start Farm Monitoring Service (compares sensor data with standards every 3 seconds)
     farmMonitoringService.start();
 
+    // 7. Start Sensor Alert Service (fires in-app notifications on threshold violations)
+    // Must start AFTER polling so Zustand stores have subscribers to observe
+    sensorAlertService.start();
+
+    // 8. Request OS notification permission (async — doesn't block splash)
+    Notifications.requestPermissionsAsync().then(({ status }) => {
+      if (status !== 'granted') {
+        console.warn('[App] ⚠️ Notification permission not granted — OS alerts will not show');
+      }
+    });
+
     // App is ready to show
     setIsAppReady(true);
 
@@ -45,6 +58,7 @@ export default function App() {
       stopMoisturePolling();
       useMoistureStore.getState().stopPolling();
       farmMonitoringService.stop();
+      sensorAlertService.stop();
     };
   }, []);
 

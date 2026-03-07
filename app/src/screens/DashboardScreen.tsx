@@ -39,6 +39,7 @@ export default function DashboardScreen({ navigation }: any) {
   const { zones, getLatestDecision } = useFarmSetupStore(); // Farm Zones
   const { temperature: sensorTemp, humidity: sensorHumidity } = useSensorStore();
   const t = useTranslation(); // Global translations
+  const { hasUnread } = useNotificationStore();
   const addAlert = useNotificationStore((state) => state.addAlert);
 
   const getInitials = (name: string) => {
@@ -173,11 +174,23 @@ export default function DashboardScreen({ navigation }: any) {
                 <Text style={styles.location}>{t('location')}</Text>
               </View>
             </View>
-            <TouchableOpacity onPress={() => navigation.navigate('Settings')}>
-              <View style={styles.profileCircle}>
-                <Text style={styles.profileInitials}>{getInitials(userName || 'Farmer')}</Text>
-              </View>
-            </TouchableOpacity>
+            <View style={styles.headerRightGroup}>
+              {/* Bell icon — navigates to Notifications stack screen */}
+              <TouchableOpacity
+                onPress={() => navigation.navigate('Notifications')}
+                style={styles.bellBtn}
+              >
+                <Ionicons name="notifications-outline" size={24} color="#FFF" />
+                {hasUnread && <View style={styles.bellDot} />}
+              </TouchableOpacity>
+
+              {/* Profile circle */}
+              <TouchableOpacity onPress={() => navigation.navigate('Settings')}>
+                <View style={styles.profileCircle}>
+                  <Text style={styles.profileInitials}>{getInitials(userName || 'Farmer')}</Text>
+                </View>
+              </TouchableOpacity>
+            </View>
           </View>
 
           {/* REAL WEATHER WIDGET */}
@@ -398,6 +411,18 @@ const styles = StyleSheet.create({
   // Header
   header: { paddingTop: 60, paddingBottom: 30, paddingHorizontal: 20, borderBottomLeftRadius: 30, borderBottomRightRadius: 30 },
   headerTop: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 25 },
+  headerRightGroup: { flexDirection: 'row', alignItems: 'center', gap: 12 },
+  bellBtn: {
+    width: 42, height: 42, borderRadius: 21,
+    backgroundColor: 'rgba(255,255,255,0.18)',
+    justifyContent: 'center', alignItems: 'center',
+  },
+  bellDot: {
+    position: 'absolute', top: 6, right: 6,
+    width: 10, height: 10, borderRadius: 5,
+    backgroundColor: '#FF5252',
+    borderWidth: 1.5, borderColor: '#1B5E20',
+  },
   greeting: { color: '#FFF', fontSize: 26, fontWeight: 'bold' },
   locationBadge: { flexDirection: 'row', alignItems: 'center', backgroundColor: 'rgba(255,255,255,0.2)', paddingHorizontal: 10, paddingVertical: 4, borderRadius: 20, marginTop: 5, alignSelf: 'flex-start' },
   location: { color: '#FFF', fontSize: 13, marginLeft: 4, fontWeight: '500' },

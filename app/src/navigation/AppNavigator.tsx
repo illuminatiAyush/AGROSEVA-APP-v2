@@ -18,15 +18,14 @@ import FarmSetupScreen from '@/screens/FarmSetupScreen';
 import SensorPlannerScreen from '@/screens/SensorPlannerScreen';
 import CropSelectionScreen from '@/screens/CropSelectionScreen';
 import SchemesScreen from '@/screens/SchemesScreen';
+import NotificationsScreen from '@/screens/NotificationsScreen';
 import { useTranslation } from '@/utils/i18n';
-import { useNotificationStore } from '@/store/useNotificationStore';
 
 // 1. Define the Tab Navigator (The Main App)
 const Tab = createBottomTabNavigator();
 
 function MainTabNavigator() {
   const t = useTranslation();
-  const hasUnread = useNotificationStore((state) => state.hasUnread);
 
   return (
     <Tab.Navigator
@@ -102,6 +101,7 @@ export default function AppNavigator() {
         <Stack.Screen name="FarmSetup" component={FarmSetupScreen} />
         <Stack.Screen name="SensorPlanner" component={SensorPlannerScreen} />
         <Stack.Screen name="Schemes" component={SchemesScreen} />
+        <Stack.Screen name="Notifications" component={NotificationsScreen} />
 
       </Stack.Navigator>
     </NavigationContainer>
