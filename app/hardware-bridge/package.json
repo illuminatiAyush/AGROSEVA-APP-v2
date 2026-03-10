@@ -1,0 +1,23 @@
+{
+  "name": "agroseva-hardware-bridge",
+  "version": "1.0.0",
+  "description": "Temporary serial-to-HTTP bridge for Arduino pH sensor",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "@serialport/parser-readline": "^12.0.0",
+    "cors": "^2.8.6",
+    "express": "^4.22.1",
+    "serialport": "^12.0.0"
+  },
+  "keywords": [
+    "arduino",
+    "serial",
+    "bridge",
+    "ph-sensor"
+  ],
+  "author": "",
+  "license": "MIT"
+}

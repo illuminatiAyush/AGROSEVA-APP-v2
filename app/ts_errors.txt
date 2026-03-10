@@ -1,0 +1,44 @@
+﻿src/components/AdvancedSoilRiskCard.tsx(87,23): error TS2322: Type 'string' is not assignable to type '"filter" | "push" | "map" | "at" | "key" | "search" | "repeat" | "link" | "body" | "code" | "menu" | "time" | "ellipse" | "image" | "stop" | "text" | "alert" | "checkbox" | "radio" | ... 1338 more ... | undefined'.
+src/components/AdvancedSoilRiskCard.tsx(102,11): error TS2769: No overload matches this call.
+  Overload 1 of 2, '(props: LinearGradientProps): LinearGradient', gave the following error.
+    Type 'string[]' is not assignable to type 'readonly [ColorValue, ColorValue, ...ColorValue[]]'.
+      Source provides no match for required element at position 0 in target.
+  Overload 2 of 2, '(props: LinearGradientProps, context: any): LinearGradient', gave the following error.
+    Type 'string[]' is not assignable to type 'readonly [ColorValue, ColorValue, ...ColorValue[]]'.
+      Source provides no match for required element at position 0 in target.
+src/components/AdvancedSoilRiskCard.tsx(107,21): error TS2322: Type 'string' is not assignable to type '"filter" | "push" | "map" | "at" | "key" | "search" | "repeat" | "link" | "body" | "code" | "menu" | "time" | "ellipse" | "image" | "stop" | "text" | "alert" | "checkbox" | "radio" | ... 1338 more ... | undefined'.
+src/components/ECRiskCard.tsx(127,23): error TS2322: Type 'string' is not assignable to type '"filter" | "push" | "map" | "at" | "key" | "search" | "repeat" | "link" | "body" | "code" | "menu" | "time" | "ellipse" | "image" | "stop" | "text" | "alert" | "checkbox" | "radio" | ... 1338 more ... | undefined'.
+src/components/ECRiskCard.tsx(142,11): error TS2769: No overload matches this call.
+  Overload 1 of 2, '(props: LinearGradientProps): LinearGradient', gave the following error.
+    Type 'string[]' is not assignable to type 'readonly [ColorValue, ColorValue, ...ColorValue[]]'.
+      Source provides no match for required element at position 0 in target.
+  Overload 2 of 2, '(props: LinearGradientProps, context: any): LinearGradient', gave the following error.
+    Type 'string[]' is not assignable to type 'readonly [ColorValue, ColorValue, ...ColorValue[]]'.
+      Source provides no match for required element at position 0 in target.
+src/components/ECRiskCard.tsx(147,21): error TS2322: Type 'string' is not assignable to type '"filter" | "push" | "map" | "at" | "key" | "search" | "repeat" | "link" | "body" | "code" | "menu" | "time" | "ellipse" | "image" | "stop" | "text" | "alert" | "checkbox" | "radio" | ... 1338 more ... | undefined'.
+src/services/SensorService.ts(6,68): error TS2339: Property 'esp32Address' does not exist on type '{ readonly useRealHardware: true; readonly hardwareBridgeUrl: "http://172.16.23.32:3000" | null; readonly clientType: "HttpPHClient" | "MockPHClient"; }'.
+src/services/WeatherTrendService.ts(91,34): error TS2339: Property 'cityName' does not exist on type '{ temp: number; humidity: number; rain: boolean; }'.
+src/store/useRecommendationStore.ts(7,10): error TS2305: Module '"./useWeatherStore"' has no exported member 'useWeatherStore'.
+src/store/useSoilStore.ts(32,15): error TS2740: Type '{}' is missing the following properties from type 'ZoneSoilData[]': length, pop, push, concat, and 35 more.
+src/utils/i18n.ts(24,25): error TS7053: Element implicitly has an 'any' type because expression of type '"loading" | "normal" | "medium" | "current" | "language" | "location" | "settings" | "remove" | "cloudy" | "analytics" | "rainy" | "sunny" | "moisture" | "nitrogen" | "phosphorus" | ... 218 more ... | "staleDataWarning"' can't be used to index type '{ greeting: string; location: string; aiRecommendation: string; recommendedCrop: string; season: string; whyThisCrop: string; hideDetails: string; parameterComparison: string; current: string; ... 224 more ...; staleDataWarning: string; } | { ...; } | { ...; }'.
+  Property 'city' does not exist on type '{ greeting: string; location: string; aiRecommendation: string; recommendedCrop: string; season: string; whyThisCrop: string; hideDetails: string; parameterComparison: string; current: string; ... 224 more ...; staleDataWarning: string; } | { ...; } | { ...; }'.
+src/utils/i18n.ts(44,23): error TS7053: Element implicitly has an 'any' type because expression of type '"loading" | "normal" | "medium" | "current" | "language" | "location" | "settings" | "remove" | "cloudy" | "analytics" | "rainy" | "sunny" | "moisture" | "nitrogen" | "phosphorus" | ... 218 more ... | "staleDataWarning"' can't be used to index type '{ greeting: string; location: string; aiRecommendation: string; recommendedCrop: string; season: string; whyThisCrop: string; hideDetails: string; parameterComparison: string; current: string; ... 224 more ...; staleDataWarning: string; } | { ...; } | { ...; }'.
+  Property 'city' does not exist on type '{ greeting: string; location: string; aiRecommendation: string; recommendedCrop: string; season: string; whyThisCrop: string; hideDetails: string; parameterComparison: string; current: string; ... 224 more ...; staleDataWarning: string; } | { ...; } | { ...; }'.
+src/utils/translations.ts(51,5): error TS1117: An object literal cannot have multiple properties with the same name.
+src/utils/translations.ts(109,5): error TS1117: An object literal cannot have multiple properties with the same name.
+src/utils/translations.ts(195,5): error TS1117: An object literal cannot have multiple properties with the same name.
+src/utils/translations.ts(242,5): error TS1117: An object literal cannot have multiple properties with the same name.
+src/utils/translations.ts(253,5): error TS1117: An object literal cannot have multiple properties with the same name.
+src/utils/translations.ts(256,5): error TS1117: An object literal cannot have multiple properties with the same name.
+src/utils/translations.ts(308,5): error TS1117: An object literal cannot have multiple properties with the same name.
+src/utils/translations.ts(374,5): error TS1117: An object literal cannot have multiple properties with the same name.
+src/utils/translations.ts(455,5): error TS1117: An object literal cannot have multiple properties with the same name.
+src/utils/translations.ts(502,5): error TS1117: An object literal cannot have multiple properties with the same name.
+src/utils/translations.ts(513,5): error TS1117: An object literal cannot have multiple properties with the same name.
+src/utils/translations.ts(516,5): error TS1117: An object literal cannot have multiple properties with the same name.
+src/utils/translations.ts(572,5): error TS1117: An object literal cannot have multiple properties with the same name.
+src/utils/translations.ts(638,5): error TS1117: An object literal cannot have multiple properties with the same name.
+src/utils/translations.ts(719,5): error TS1117: An object literal cannot have multiple properties with the same name.
+src/utils/translations.ts(766,5): error TS1117: An object literal cannot have multiple properties with the same name.
+src/utils/translations.ts(777,5): error TS1117: An object literal cannot have multiple properties with the same name.
+src/utils/translations.ts(780,5): error TS1117: An object literal cannot have multiple properties with the same name.

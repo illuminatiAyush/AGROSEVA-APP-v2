@@ -1,0 +1,12 @@
+{
+  "extends": "expo/tsconfig.base",
+  "compilerOptions": {
+    "strict": true,
+    "jsx": "react-native",
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["src/*"]
+    }
+  },
+  "_comment": "Path alias configuration: @/ maps to src/. This MUST stay in sync with babel.config.js module-resolver plugin. If aliases break, restart Expo with: expo start -c"
+}

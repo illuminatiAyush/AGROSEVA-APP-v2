@@ -1,0 +1,41 @@
+# ── Python ──────────────────────────────────────────────
+__pycache__/
+*.pyc
+*.pyo
+*.egg-info/
+venv/
+.venv/
+backend/venv/
+backend/ml/online/venv/
+
+# ── Environment ────────────────────────────────────────
+.env
+.env.local
+
+# ── ML Models (too large for Git — see SETUP.md) ──────
+# Your friend must download/train these separately
+*.h5
+*.keras
+*.tflite
+*.pth
+*.onnx
+*.pkl
+backend/drl/logs/
+backend/drl/models/
+backend/drl/plots/
+backend/drl/policy.pth
+backend/ml/training_curves.png
+backend/ml/confusion_matrix*.png
+backend/ml/training_hist.json
+backend/ml/temp_binary_*/
+
+# ── Node / Expo ────────────────────────────────────────
+node_modules/
+.expo/
+dist/
+*.tsbuildinfo
+
+# ── OS ─────────────────────────────────────────────────
+.DS_Store
+Thumbs.db
+desktop.ini
